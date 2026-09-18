@@ -1574,6 +1574,8 @@
     let assumptionAck = false;
     let pendingConfirmX = null;
     let pendingAssumed = [];
+    // AI 标注的“这门生意实际涉及”的字段（自定义场景筛缺项用；空则不筛）
+    let customRelevant = [];
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const validUnit = value => /^[\p{L}]{1,8}$/u.test(String(value || '')) ? String(value) : '';
     function inferTransactionUnit(text = '') {
@@ -2504,9 +2506,11 @@
 
     function collectAssumedFields() {
       const out = [];
+      const only = customRelevant.length ? new Set(customRelevant) : null;
       for (const [k] of specs) {
         const el = $(k);
         if (!el || el.dataset.assumed !== '1') continue;
+        if (only && !only.has(k)) continue; // 与这门生意无关的项不列入缺项
         const wrap = document.querySelector(`[data-field="${k}"]`);
         if (wrap && wrap.hidden) continue; // 当前场景不显示的项不算
         out.push({ k, label: wrap?.querySelector('.field-label')?.textContent?.trim() || k });
@@ -2523,12 +2527,17 @@
       const box = $('assumption-modal');
       if ($('kz-modal-count')) $('kz-modal-count').textContent = pendingAssumed.length;
       if ($('kz-modal-list')) $('kz-modal-list').innerHTML = pendingAssumed.map(f => `<li>${f.label}</li>`).join('');
+      if ($('kz-modal-sub')) $('kz-modal-sub').innerHTML = customRelevant.length
+        ? '已按这门生意筛除不相关项；未补充的会按 <strong>0</strong> 计入，结果可能偏高。你可以先去补充，也可以直接测算。'
+        : '未补充的项会按 <strong>0</strong> 计入，测算结果可能偏高。你可以先去补充，也可以直接测算。';
       if (box) box.hidden = false;
       // 弹窗标记在 <script> 之后，所以事件在打开时绑定
       const go = $('kz-modal-go'), fill = $('kz-modal-fill'), sel = $('kz-modal-scene-select');
       if (sel && $('scene-kind')) sel.value = $('scene-kind').value;
       if (sel) sel.onchange = () => {
         try { setScene(sel.value, { unit: currentUnit }); renderSceneUI(); render(); } catch (e) {}
+        // 用户手动选场景时，以场景为准，不再用 AI 的 relevant 过滤
+        customRelevant = [];
         pendingAssumed = collectAssumedFields();
         if ($('kz-modal-count')) $('kz-modal-count').textContent = pendingAssumed.length;
         if ($('kz-modal-list')) $('kz-modal-list').innerHTML = pendingAssumed.map(f => `<li>${f.label}</li>`).join('');
@@ -2601,6 +2610,7 @@
           if (typeof applyUnit === 'function') applyUnit(manualUnit);
         }
         aiSceneTitle = '';
+        customRelevant = [];
         clearAssumedMarks();
         assumptionFields = [];
         assumptionAck = false;
@@ -2726,6 +2736,7 @@
           const rawTitle = (typeof data.title === 'string' && data.title.trim()) ? data.title.trim() : '';
           const sceneLabel = (sceneProfile && sceneProfile.label) ? String(sceneProfile.label).split('/')[0].trim() : '';
           aiSceneTitle = (rawTitle || sceneLabel).slice(0, 16);
+          customRelevant = Array.isArray(data.relevant) ? data.relevant.filter(k => typeof k === 'string') : [];
           const h = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
           if (h) h.textContent = (aiSceneTitle || '自定义场景') + ' · 开张前测算';
         }
@@ -3160,6 +3171,7 @@ ${decWhy}
       }
 
       aiSceneTitle = '';
+      customRelevant = [];
       clearAssumedMarks();
       assumptionFields = [];
       assumptionAck = false;
@@ -3255,7 +3267,7 @@ ${decWhy}
   <div id="assumption-modal" class="kz-modal" hidden>
     <div class="kz-modal-card" role="dialog" aria-modal="true" aria-labelledby="kz-modal-title">
       <h3 id="kz-modal-title">还有 <span id="kz-modal-count">0</span> 项成本没填</h3>
-      <p class="kz-modal-sub">未补充的项会按 <strong>0</strong> 计入，测算结果可能偏高。你可以先去补充，也可以直接测算。</p>
+      <p class="kz-modal-sub" id="kz-modal-sub">未补充的项会按 <strong>0</strong> 计入，测算结果可能偏高。你可以先去补充，也可以直接测算。</p>
       <ul id="kz-modal-list" class="kz-modal-list"></ul>
       <div class="kz-modal-scene">
         <label for="kz-modal-scene-select">场景不对？手动选：</label>

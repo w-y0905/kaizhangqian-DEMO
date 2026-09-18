@@ -261,6 +261,10 @@ function sanitize(obj, text = '') {
   out.title = typeof (obj && obj.title) === 'string'
     ? obj.title.replace(/["'\n\r]/g, '').trim().slice(0, 16)
     : '';
+  // AI 标注的“这门生意实际可能涉及”的字段（供前端筛缺项）
+  out.relevant = Array.isArray(obj && obj.relevant)
+    ? obj.relevant.map(k => String(k).trim()).filter(k => FIELD_KEYS.includes(k))
+    : [];
   if (!out.questions.length) out.questions = sceneQuestions(out.scene);
   out.questions = [...conversionQuestions(out.fields, text), ...out.questions].slice(0, 5);
   return out;
@@ -270,6 +274,7 @@ function buildPrompt(text) {
   return `请解析下面这段大学生创业描述，并只输出一个 JSON 对象，不要 Markdown：
 {
   "title": "",
+  "relevant": [],
   "scene": {"key":"beverage|retail|skill|creative|other"},
   "fields": {
     "price":{"value":0,"unit":"","sourceText":"","confidence":0},
@@ -291,7 +296,7 @@ function buildPrompt(text) {
   "assumptions": [],
   "recommendation": ""
 }
-规则：title 是根据用户描述概括出的 4-10 字经营场景简称（如"宠物代遛""快递代取""宿舍美甲"），**必须填写，不得留空**；只填写原文明确给出的非负数字；未知字段不要猜，放入 missing；scene.key 必须从五个枚举中选择；**若无法确定属于哪一类（非典型生意，如遛狗、代取快递），scene.key 选 other，不要硬塞到不匹配的类别**；questions 必须围绕该场景的成本和工作方式。price、raw、pack 按一次计价单位填写，sales 是每营业日的交付量，hours 是每日总工作小时。严格区分双、杯、条、单与工时；不要一律使用份。每周量需要实际每周营业天数才能转换；缺少因素时不要猜。raw 和 pack 不得重复计入同一笔耗材。
+规则：title 是根据用户描述概括出的 4-10 字经营场景简称（如"宠物代遛""快递代取""宿舍美甲"），**必须填写，不得留空**；relevant 用字段名列出这门生意**实际可能涉及**的项（供前端提示缺项用），取值范围：price/raw/pack/loss/fee/sales/days/rent/other/investment/life/hours/wage，**宁可多列不要漏**（如室内宿舍生意勿列 rent，无线上渠道勿列 fee），price 和 sales 必须包含；只填写原文明确给出的非负数字；未知字段不要猜，放入 missing；scene.key 必须从五个枚举中选择；**若无法确定属于哪一类（非典型生意，如遛狗、代取快递），scene.key 选 other，不要硬塞到不匹配的类别**；questions 必须围绕该场景的成本和工作方式。price、raw、pack 按一次计价单位填写，sales 是每营业日的交付量，hours 是每日总工作小时。严格区分双、杯、条、单与工时；不要一律使用份。每周量需要实际每周营业天数才能转换；缺少因素时不要猜。raw 和 pack 不得重复计入同一笔耗材。
 经营描述：${text}`;
 }
 
