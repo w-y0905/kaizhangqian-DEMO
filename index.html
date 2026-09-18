@@ -1059,6 +1059,22 @@
       .decision p { color: #444 !important; }
       .print-only { display: block; font-size: 11px; color: #666; margin: 10px 0; }
     }
+  /* 默认假设提示 / 确认弹窗 */
+  .assumption-notice {
+    margin: 8px 0 0; padding: 8px 12px; border-radius: 10px;
+    background: #fff8e1; border: 1px solid #f0d48a; color: #8a6100;
+    font-size: 12.5px; font-weight: 600; line-height: 1.55;
+  }
+  .kz-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(20,16,14,0.45); padding: 16px; }
+  .kz-modal[hidden] { display: none; }
+  .kz-modal-card { background: #fff; border-radius: 16px; max-width: 430px; width: 100%; padding: 20px 20px 16px; box-shadow: 0 18px 48px rgba(0,0,0,0.28); }
+  .kz-modal-card h3 { margin: 0 0 6px; font-size: 17px; }
+  .kz-modal-sub { margin: 0 0 10px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .kz-modal-list { margin: 0 0 16px; padding-left: 18px; font-size: 13px; line-height: 1.7; max-height: 32vh; overflow: auto; }
+  .kz-modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .kz-modal-actions button { min-height: 38px; font-size: 14px; padding: 0 18px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+  .kz-modal-actions .btn-primary { width: auto; }
+  .kz-modal-actions .kz-ghost { background: #fff; border: 1px solid var(--line); color: var(--ink); }
   </style>
 </head>
 <body>
@@ -1246,6 +1262,7 @@
               <div class="step-tag">Decision Studio / 商业决策大盘</div>
               <h2>校园柠檬茶 · 开张前测算</h2>
               <p class="hint" id="scenario-label" style="font-weight: 500;"></p>
+              <p id="assumption-notice" class="assumption-notice" hidden></p>
             </div>
             <div class="toolbar">
               <button id="copy-summary" type="button">📋 复制报告摘要</button>
@@ -1550,6 +1567,10 @@
     let extractionController = null, extractionVersion = 0, sceneVersion = 0;
     // AI 识别的经营场景简称（仅自定义输入时使用，用于决策大盘标题）
     let aiSceneTitle = '';
+    // 自定义场景中被“默认假设”补齐的字段（{k,label,dv}），用于确认弹窗与结果提示条
+    let assumptionFields = [];
+    let assumptionAck = false;
+    let pendingConfirmX = null;
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const validUnit = value => /^[\p{L}]{1,8}$/u.test(String(value || '')) ? String(value) : '';
     function inferTransactionUnit(text = '') {
@@ -2445,6 +2466,14 @@
         return;
       }
       $('error').textContent = '';
+      // 还有“默认假设”未确认时，先弹窗让用户选择：去补充 / 直接测算
+      assumptionFields = assumptionFields.filter(f => $(f.k) && String($(f.k).value) === String(f.dv));
+      if (assumptionFields.length && !assumptionAck) { openAssumptionModal(x); return; }
+      applyConfirmed(x);
+    });
+
+    function applyConfirmed(x) {
+      $('error').textContent = '';
       confirmed = x;
       pendingReview = false;
       renderSceneUI();
@@ -2452,7 +2481,46 @@
       renderImpact();
       renderActions();
       drawTrials();
-    });
+      const notice = $('assumption-notice');
+      if (notice) {
+        if (assumptionFields.length) {
+          notice.hidden = false;
+          notice.textContent = `本次测算含 ${assumptionFields.length} 项默认假设（未识别成本按 0 计），结果仅供参考：${assumptionFields.map(f => f.label).join('、')}`;
+        } else {
+          notice.hidden = true;
+        }
+      }
+    }
+
+    function openAssumptionModal(x) {
+      pendingConfirmX = x;
+      const box = $('assumption-modal');
+      if ($('kz-modal-count')) $('kz-modal-count').textContent = assumptionFields.length;
+      if ($('kz-modal-list')) $('kz-modal-list').innerHTML = assumptionFields.map(f => `<li>${f.label}</li>`).join('');
+      if (box) box.hidden = false;
+      // 弹窗标记在 <script> 之后，所以事件在打开时绑定
+      const go = $('kz-modal-go'), fill = $('kz-modal-fill');
+      if (go) go.onclick = () => {
+        assumptionAck = true;
+        closeAssumptionModal();
+        if (pendingConfirmX) applyConfirmed(pendingConfirmX);
+      };
+      if (fill) fill.onclick = () => {
+        closeAssumptionModal();
+        const first = assumptionFields[0];
+        if (first && $(first.k)) {
+          const wrap = document.querySelector(`[data-field="${first.k}"]`);
+          if (wrap && wrap.closest('#fields-advanced') && $('advanced-details')) $('advanced-details').open = true;
+          (wrap || $(first.k)).scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { try { $(first.k).focus(); } catch (e) {} }, 350);
+        } else {
+          const q = $('ai-reply-card') || $('ai-questions-container');
+          if (q) q.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if ($('ai-reply-input')) $('ai-reply-input').focus();
+        }
+      };
+    }
+    function closeAssumptionModal() { const b = $('assumption-modal'); if (b) b.hidden = true; }
 
     // Fallback Regex Patterns
     const patterns = {
@@ -2498,6 +2566,8 @@
           if (typeof applyUnit === 'function') applyUnit(manualUnit);
         }
         aiSceneTitle = '';
+        assumptionFields = [];
+        assumptionAck = false;
         const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
         if (heading) heading.textContent = '自定义场景 · 开张前测算';
         if ($('scenario-notice')) $('scenario-notice').textContent = `这是自定义经营场景（${sceneProfile.label}）；AI 将按你的描述识别单位、成本和工作方式。`;
@@ -2577,10 +2647,14 @@
           for (const [k] of specs) {
             if (!$(k) || String($(k).value).trim() !== '') continue;
             if (mustAskUser.has(k)) continue;
-            $(k).value = (structuralDefaults[k] !== undefined) ? structuralDefaults[k] : 0;
+            const dv = (structuralDefaults[k] !== undefined) ? structuralDefaults[k] : 0;
+            $(k).value = dv;
             const srcEl = $('source-' + k);
             if (srcEl) { srcEl.textContent = '默认假设 · 待核对'; srcEl.className = 'source'; }
+            const lbl = document.querySelector(`[data-field="${k}"] .field-label`)?.textContent?.trim() || k;
+            if (!assumptionFields.some(f => f.k === k)) assumptionFields.push({ k, label: lbl, dv });
           }
+          if (assumptionFields.length) assumptionAck = false;
         }
         // Service descriptions such as “清洁剂和包装成本” are normalized
         // by the backend into the visible direct-consumables field. Clear a
@@ -3051,6 +3125,10 @@ ${decWhy}
       }
 
       aiSceneTitle = '';
+      assumptionFields = [];
+      assumptionAck = false;
+      const noticeEl = $('assumption-notice');
+      if (noticeEl) noticeEl.hidden = true;
       const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
       if (heading) heading.textContent = t.title + ' · 开张前测算';
       
@@ -3138,5 +3216,16 @@ ${decWhy}
       bindQuestionPillClick($('ai-questions-list'));
     }
   </script>
+  <div id="assumption-modal" class="kz-modal" hidden>
+    <div class="kz-modal-card" role="dialog" aria-modal="true" aria-labelledby="kz-modal-title">
+      <h3 id="kz-modal-title">还有 <span id="kz-modal-count">0</span> 项成本没填</h3>
+      <p class="kz-modal-sub">未补充的项会按 <strong>0</strong> 计入，测算结果可能偏高。你可以先去补充，也可以直接测算。</p>
+      <ul id="kz-modal-list" class="kz-modal-list"></ul>
+      <div class="kz-modal-actions">
+        <button type="button" id="kz-modal-go" class="kz-ghost">直接测算</button>
+        <button type="button" id="kz-modal-fill" class="btn-primary">去补充</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
