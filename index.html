@@ -1131,7 +1131,7 @@
         <section class="card ai-feedback-panel" id="ai-feedback-card">
           <div class="ai-header">
             <div class="ai-title">🤖 AI 商业顾问排查</div>
-            <span class="ai-status-tag" id="ai-mode-tag">OpenClaw / DeepSeek</span>
+            <span class="ai-status-tag" id="ai-mode-tag">DeepSeek 大模型</span>
           </div>
           <p class="hint" id="ai-summary-text">已接入 DeepSeek 大模型：输入经营描述并点击“智能提取”，AI 会识别经营场景、提取已知参数，并针对你的成本盲区生成追问。</p>
           
@@ -2568,6 +2568,18 @@
             }
           }
         }
+        // 自定义场景：AI 未给出的结构性参数（营业天数/每日工时/折旧月数）给默认假设，
+        // 否则这三项为空会直接阻断“确认参数”，自定义场景就算不出结果。
+        if (isCustomText) {
+          const structuralDefaults = { days: 20, hours: 4, life: 24 };
+          for (const [k, dv] of Object.entries(structuralDefaults)) {
+            if ($(k) && String($(k).value).trim() === '') {
+              $(k).value = dv;
+              const srcEl = $('source-' + k);
+              if (srcEl) { srcEl.textContent = '默认假设 · 待核对'; srcEl.className = 'source'; }
+            }
+          }
+        }
         // Service descriptions such as “清洁剂和包装成本” are normalized
         // by the backend into the visible direct-consumables field. Clear a
         // template's stale packaging preset so the same cost is not counted
@@ -2594,7 +2606,7 @@
         }
 
         const qs = (data.questions || []).slice(0, 6);
-        const modeLabel = String(data.mode || 'AI').startsWith('rules') ? '规则回退引擎' : 'OpenClaw / DeepSeek';
+        const modeLabel = String(data.mode || 'AI').startsWith('rules') ? '规则回退引擎' : 'DeepSeek 大模型';
         $('ai-mode-tag').textContent = modeLabel;
         $('ai-summary-text').textContent = `${modeLabel} 已识别为「${sceneProfile.label}」，提取 ${n} 个关键经营参数。请按当前场景核对下方成本与工时：`;
 

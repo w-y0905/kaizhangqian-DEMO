@@ -21,6 +21,25 @@ function readGatewayToken() {
 }
 const TOKEN = readGatewayToken();
 
+// 读取 DeepSeek 配置：优先环境变量，否则读本机 openclaw.json（key 不落日志、不下发前端）
+function readDeepSeekCfg() {
+  const base = (process.env.DEEPSEEK_BASE_URL || '').replace(/\/$/, '');
+  if (process.env.DEEPSEEK_API_KEY) {
+    return { key: process.env.DEEPSEEK_API_KEY.trim(), base: base || 'https://api.deepseek.com', model: process.env.DEEPSEEK_MODEL || 'deepseek-chat' };
+  }
+  try {
+    const cfg = JSON.parse(fs.readFileSync('/root/.openclaw/openclaw.json', 'utf8'));
+    const p = cfg.models && cfg.models.providers && cfg.models.providers.deepseek;
+    if (p && p.apiKey) return {
+      key: String(p.apiKey).trim(),
+      base: base || String(p.baseUrl || 'https://api.deepseek.com').replace(/\/$/, ''),
+      model: process.env.DEEPSEEK_MODEL || 'deepseek-chat'
+    };
+  } catch {}
+  return { key: '', base: base || 'https://api.deepseek.com', model: process.env.DEEPSEEK_MODEL || 'deepseek-chat' };
+}
+const DEEPSEEK = readDeepSeekCfg();
+
 const SCENE_DEFS = {
   beverage: { label: '饮品 / 食品', unit: '杯', kind: 'product' },
   retail: { label: '零售 / 电商', unit: '份', kind: 'product' },
@@ -213,6 +232,9 @@ function sanitize(obj, text = '') {
   for (const k of FIELD_KEYS) {
     const it = src[k];
     if (it && typeof it === 'object' && isNum(it.value)) {
+      // 直接调 DeepSeek 时模型会把没提到的字段也填成 0 占位（sourceText 为空）——
+      // 这类占位不算“已识别”，归入 missing 由用户核对。
+      if (it.value === 0 && !String(it.sourceText || '').trim()) continue;
       out.fields[k] = {
         value: it.value,
         unit: String(it.unit || ''),
@@ -244,11 +266,8 @@ function sanitize(obj, text = '') {
   return out;
 }
 
-async function callAI(text) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), AI_TIMEOUT_MS);
-  try {
-    const prompt = `请解析下面这段大学生创业描述，并只输出一个 JSON 对象，不要 Markdown：
+function buildPrompt(text) {
+  return `请解析下面这段大学生创业描述，并只输出一个 JSON 对象，不要 Markdown：
 {
   "title": "",
   "scene": {"key":"beverage|retail|skill|creative|other"},
@@ -274,25 +293,75 @@ async function callAI(text) {
 }
 规则：title 是根据用户描述概括出的 4-10 字经营场景简称（如"宠物代遛""快递代取""宿舍美甲"），**必须填写，不得留空**；只填写原文明确给出的非负数字；未知字段不要猜，放入 missing；scene.key 必须从五个枚举中选择；questions 必须围绕该场景的成本和工作方式。price、raw、pack 按一次计价单位填写，sales 是每营业日的交付量，hours 是每日总工作小时。严格区分双、杯、条、单与工时；不要一律使用份。每周量需要实际每周营业天数才能转换；缺少因素时不要猜。raw 和 pack 不得重复计入同一笔耗材。
 经营描述：${text}`;
+}
+
+// 把模型返回的文本解析成规整结果
+function parseModelContent(content, text, mode) {
+  let c = String(content || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  const s = c.indexOf('{'), e = c.lastIndexOf('}');
+  if (s < 0 || e < 0) throw new Error('NO_JSON');
+  const parsed = JSON.parse(c.slice(s, e + 1));
+  const out = sanitize(parsed, text);
+  if (mode) out.mode = mode;
+  if (Object.keys(out.fields).length === 0) throw new Error('NO_FIELDS');
+  return out;
+}
+
+// 直连 DeepSeek（主路径，延迟最低）
+async function callDirect(text) {
+  if (!DEEPSEEK.key) throw new Error('NO_DEEPSEEK_KEY');
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), AI_TIMEOUT_MS);
+  try {
+    const r = await fetch(DEEPSEEK.base + '/chat/completions', {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + DEEPSEEK.key },
+      body: JSON.stringify({
+        model: DEEPSEEK.model,
+        temperature: 0,
+        response_format: { type: 'json_object' },
+        messages: [{ role: 'user', content: buildPrompt(text) }]
+      })
+    });
+    if (!r.ok) throw new Error('UPSTREAM_' + r.status);
+    const j = await r.json();
+    const content = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+    if (typeof content !== 'string' || !content.trim()) throw new Error('EMPTY_CONTENT');
+    return parseModelContent(content, text, 'deepseek-direct');
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// 备用路径：仍可走 OpenClaw 网关（直连失败时自动回退）
+async function callViaGateway(text) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), AI_TIMEOUT_MS);
+  try {
     const r = await fetch(OPENCLAW_URL, {
       method: 'POST',
       signal: ctrl.signal,
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
-      body: JSON.stringify({ model: MODEL_FIELD, temperature: 0, messages: [{ role: 'user', content: prompt }] })
+      body: JSON.stringify({ model: MODEL_FIELD, temperature: 0, messages: [{ role: 'user', content: buildPrompt(text) }] })
     });
     if (!r.ok) throw new Error('UPSTREAM_' + r.status);
     const j = await r.json();
-    let content = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+    const content = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
     if (typeof content !== 'string' || !content.trim()) throw new Error('EMPTY_CONTENT');
-    content = content.trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
-    const s = content.indexOf('{'), e = content.lastIndexOf('}');
-    if (s < 0 || e < 0) throw new Error('NO_JSON');
-    const parsed = JSON.parse(content.slice(s, e + 1));
-    const out = sanitize(parsed, text);
-    if (Object.keys(out.fields).length === 0) throw new Error('NO_FIELDS');
-    return out;
+    return parseModelContent(content, text);
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// 依次尝试：直连 DeepSeek → OpenClaw 网关；都已失败则由上层回退规则引擎
+async function callAI(text) {
+  try {
+    return await callDirect(text);
+  } catch (err1) {
+    console.error('[extract] 直连 DeepSeek 失败，尝试网关：' + (err1 && err1.message ? err1.message : 'unknown'));
+    return await callViaGateway(text);
   }
 }
 
@@ -544,7 +613,7 @@ const server = http.createServer((req, res) => {
       }
       try {
         const ai = await callAI(text);
-        if (ai && typeof ai.mode === 'string' && ai.mode.startsWith('openclaw')) cacheSet(ck, ai);
+        if (ai && typeof ai.mode === 'string' && !ai.mode.startsWith('rules')) cacheSet(ck, ai);
         return sendJSON(res, 200, ai);
       } catch (err) {
         // 不记录用户原文与密钥
@@ -564,7 +633,7 @@ const server = http.createServer((req, res) => {
   if (pathname === '/health') {
     return sendJSON(res, 200, {
       status: 'ok',
-      extraction: 'openclaw-with-rules-fallback',
+      extraction: 'deepseek-direct-with-gateway-fallback',
       aiConfigured: Boolean(TOKEN),
       agent: AGENT_ID,
       api: '/api/extract'
@@ -591,7 +660,7 @@ server.listen(PORT, '127.0.0.1');
   for (const t of PRESET_TEXTS) {
     try {
       const v = await callAI(t);
-      if (v && typeof v.mode === 'string' && v.mode.startsWith('openclaw')) { cacheSet(cacheKey(t), v); ok++; }
+      if (v && typeof v.mode === 'string' && !v.mode.startsWith('rules')) { cacheSet(cacheKey(t), v); ok++; }
     } catch { /* 预热失败不影响服务 */ }
   }
   console.log('[cache] prewarmed ' + ok + '/' + PRESET_TEXTS.length + ' preset scenarios');
