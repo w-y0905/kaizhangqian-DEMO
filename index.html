@@ -1579,7 +1579,7 @@
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const validUnit = value => /^[\p{L}]{1,8}$/u.test(String(value || '')) ? String(value) : '';
     function inferTransactionUnit(text = '') {
-      const units = '(人次|小时|课时|公斤|千克|公里|分钟|双|杯|份|件|单|次|套|条|张|本|台|个|瓶|盒|斤|米)';
+      const units = '(人次|小时|课时|公斤|千克|公里|分钟|双|杯|份|件|单|次|套|条|张|本|台|个|瓶|盒|斤|米|根|串|只|支)';
       const price = String(text).match(new RegExp('(?:每|一)' + units + '(?:平均)?(?:收费|售价|卖价|卖|收|价格|定价)?\\s*\\d+(?:\\.\\d+)?\\s*元'));
       const reversed = String(text).match(new RegExp('\\d+(?:\\.\\d+)?\\s*元\\s*[/／]\\s*' + units));
       const volume = String(text).match(new RegExp('(?:每天|每日|一天)[^，。；\\n]{0,12}?(?:卖|销售|接|交付|完成|洗)\\s*\\d+(?:\\.\\d+)?\\s*' + units));
@@ -2721,9 +2721,9 @@
           data.fields?.sales?.unit,
           data.fields?.price?.unit,
         ].map(v => String(v || ''));
-        const detectedUnit = unitCandidates.find(u => /人次|小时|课时|公斤|千克|双|杯|份|件|单|次|套|条|张|本|台|瓶|盒/.test(u));
+        const detectedUnit = unitCandidates.find(u => /人次|小时|课时|公斤|千克|双|杯|份|件|单|次|套|条|张|本|台|瓶|盒|根|串|只|支/.test(u));
         if (detectedUnit && !manualUnit && typeof applyUnit === 'function') {
-          applyUnit(detectedUnit.match(/人次|小时|课时|公斤|千克|双|杯|份|件|单|次|套|条|张|本|台|瓶|盒/)[0]);
+          applyUnit(detectedUnit.match(/人次|小时|课时|公斤|千克|双|杯|份|件|单|次|套|条|张|本|台|瓶|盒|根|串|只|支/)[0]);
         }
 
         const qs = (data.questions || []).slice(0, 6);

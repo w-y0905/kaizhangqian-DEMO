@@ -50,7 +50,7 @@ const SCENE_DEFS = {
 
 // A work-hour mention is not a transaction unit. Read only explicit pricing
 // and completed/sold quantity phrases, with longer unit names matched first.
-const TRANSACTION_UNITS = '人次|平方米|公斤|小时|课时|双|杯|份|件|条|张|页|套|单|次|人|个|瓶|盒|包|盘|斤|米|场|节|亩|天';
+const TRANSACTION_UNITS = '人次|平方米|公斤|小时|课时|双|杯|份|件|条|张|页|套|单|次|人|个|瓶|盒|包|盘|斤|米|场|节|亩|天|根|串|只|支';
 function inferTransactionUnit(text = '') {
   const s = String(text);
   const priceUnit = s.match(new RegExp('(?:每|一)(' + TRANSACTION_UNITS + ')(?:平均)?\\s*(?:收费|售价|价格|卖价|卖|收|收入|服务价)?\\s*(?:为|是|约|大约)?\\s*\\d+(?:\\.\\d+)?\\s*元')) ||
@@ -262,11 +262,36 @@ function sanitize(obj, text = '') {
     ? obj.title.replace(/["'\n\r]/g, '').trim().slice(0, 16)
     : '';
   // AI 标注的“这门生意实际可能涉及”的字段（供前端筛缺项）
+  if (!out.questions.length) out.questions = sceneQuestions(out.scene);
+  out.questions = [...conversionQuestions(out.fields, text), ...out.questions].slice(0, 5);
+  // AI 标注的“这门生意实际可能涉及”的字段（供前端筛缺项），再与追问里提到的成本项对齐
   out.relevant = Array.isArray(obj && obj.relevant)
     ? obj.relevant.map(k => String(k).trim()).filter(k => FIELD_KEYS.includes(k))
     : [];
-  if (!out.questions.length) out.questions = sceneQuestions(out.scene);
-  out.questions = [...conversionQuestions(out.fields, text), ...out.questions].slice(0, 5);
+  for (const k of inferRelevantFromQuestions(out.questions)) {
+    if (!out.relevant.includes(k)) out.relevant.push(k);
+  }
+  return out;
+}
+
+// 从 AI 追问文本里推出涉及的成本字段，避免“追问问了但缺项清单不列”的不一致
+const RELEVANT_HINTS = {
+  pack: /包装|耗材|竹签|纸袋|塑料袋|餐具|相纸|清洁剂/,
+  loss: /损耗|变质|破损|返工|报废|滞销/,
+  fee: /抽成|佣金|平台费|手续费/,
+  rent: /摊位费|场地费|房租|租金|工作室|仓储/,
+  investment: /设备|初始投入|购置|机器|推车|制冰机|封口机|工具/,
+  fixed: /其他.{0,6}支出|燃气|运输|卫生费|推广|水电/,
+  hours: /工时|小时|出摊时间/,
+  wage: /时薪|人工|工资|劳动报酬/,
+  days: /营业天数|出摊天数|经营天数/
+};
+function inferRelevantFromQuestions(questions) {
+  const t = (questions || []).join(' ');
+  const out = [];
+  for (const [k, re] of Object.entries(RELEVANT_HINTS)) {
+    if (re.test(t)) out.push(k === 'fixed' ? 'other' : k);
+  }
   return out;
 }
 
@@ -296,7 +321,7 @@ function buildPrompt(text) {
   "assumptions": [],
   "recommendation": ""
 }
-规则：title 是根据用户描述概括出的 4-10 字经营场景简称（如"宠物代遛""快递代取""宿舍美甲"），**必须填写，不得留空**；relevant 用字段名列出这门生意**实际可能涉及**的项（供前端提示缺项用），取值范围：price/raw/pack/loss/fee/sales/days/rent/other/investment/life/hours/wage，**宁可多列不要漏**（如室内宿舍生意勿列 rent，无线上渠道勿列 fee），price 和 sales 必须包含；只填写原文明确给出的非负数字；未知字段不要猜，放入 missing；scene.key 必须从五个枚举中选择；**若无法确定属于哪一类（非典型生意，如遛狗、代取快递），scene.key 选 other，不要硬塞到不匹配的类别**；questions 必须围绕该场景的成本和工作方式。price、raw、pack 按一次计价单位填写，sales 是每营业日的交付量，hours 是每日总工作小时。严格区分双、杯、条、单与工时；不要一律使用份。每周量需要实际每周营业天数才能转换；缺少因素时不要猜。raw 和 pack 不得重复计入同一笔耗材。
+规则：title 是根据用户描述概括出的 4-10 字经营场景简称（如"宠物代遛""快递代取""宿舍美甲"），**必须填写，不得留空**；relevant 用字段名列出这门生意**实际可能涉及**的项（供前端提示缺项用），取值范围：price/raw/pack/loss/fee/sales/days/rent/other/investment/life/hours/wage，**宁可多列不要漏**（如室内宿舍生意勿列 rent，无线上渠道勿列 fee），price 和 sales 必须包含，**且 questions 里提到的成本项必须包含在 relevant 里**；只填写原文明确给出的非负数字；未知字段不要猜，放入 missing；scene.key 必须从五个枚举中选择；**若无法确定属于哪一类（非典型生意，如遛狗、代取快递），scene.key 选 other，不要硬塞到不匹配的类别**；questions 必须围绕该场景的成本和工作方式。price、raw、pack 按一次计价单位填写，sales 是每营业日的交付量，hours 是每日总工作小时。严格区分双、杯、条、单与工时；不要一律使用份。每周量需要实际每周营业天数才能转换；缺少因素时不要猜。raw 和 pack 不得重复计入同一笔耗材。
 经营描述：${text}`;
 }
 
