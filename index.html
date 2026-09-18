@@ -1547,6 +1547,8 @@
     let sceneProfile = SCENE_PROFILES.beverage;
     let currentUnit = sceneProfile.unit, pendingReview = false;
     let extractionController = null, extractionVersion = 0, sceneVersion = 0;
+    // AI 识别的经营场景简称（仅自定义输入时使用，用于决策大盘标题）
+    let aiSceneTitle = '';
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const validUnit = value => /^[\p{L}]{1,8}$/u.test(String(value || '')) ? String(value) : '';
     function inferTransactionUnit(text = '') {
@@ -1643,7 +1645,7 @@
       document.querySelectorAll('.chip-btn').forEach((btn, i) => { if (chipExamples[i]) { btn.textContent = chipExamples[i].label; btn.dataset.preset = chipExamples[i].value; } });
       if ($('ai-reply-input')) $('ai-reply-input').placeholder = service ? '例如：每天包含准备和交付共5小时；直接耗材3元，包装2元。请按真实情况补充。' : '例如：包装成本每份0.5元；每天备货、售卖和收尾共5小时。请按真实情况补充。';
       const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
-      if (heading && !pendingReview) heading.textContent = profile.title + ' · 开张前测算';
+      if (heading && !pendingReview) heading.textContent = (aiSceneTitle || profile.title) + ' · 开张前测算';
       if ($('cost-viz-title')) $('cost-viz-title').textContent = profile.kind === 'service' ? `💰 每${currentUnit}服务收入与交付成本` : `💰 每${currentUnit}价格与成本结构`;
       if ($('scene-kind')) $('scene-kind').value = profile.key;
       if ($('business-unit')) $('business-unit').value = currentUnit;
@@ -2494,6 +2496,7 @@
           manualUnit = customUnit;
           if (typeof applyUnit === 'function') applyUnit(manualUnit);
         }
+        aiSceneTitle = '';
         const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
         if (heading) heading.textContent = '自定义场景 · 开张前测算';
         if ($('scenario-notice')) $('scenario-notice').textContent = `这是自定义经营场景（${sceneProfile.label}）；AI 将按你的描述识别单位、成本和工作方式。`;
@@ -2593,6 +2596,13 @@
         const modeLabel = String(data.mode || 'AI').startsWith('rules') ? '规则回退引擎' : 'OpenClaw / DeepSeek';
         $('ai-mode-tag').textContent = modeLabel;
         $('ai-summary-text').textContent = `${modeLabel} 已识别为「${sceneProfile.label}」，提取 ${n} 个关键经营参数。请按当前场景核对下方成本与工时：`;
+
+        // 自定义输入：用 AI 识别出的场景简称做决策大盘标题（识别不出则退回“自定义场景”）
+        if (isCustomText) {
+          aiSceneTitle = (typeof data.title === 'string' && data.title.trim()) ? data.title.trim().slice(0, 16) : '';
+          const h = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
+          if (h) h.textContent = (aiSceneTitle || '自定义场景') + ' · 开张前测算';
+        }
 
         if (qs.length) {
           renderExpandableQuestions(qs);
@@ -3023,6 +3033,7 @@ ${decWhy}
         if ($('hours')) $('hours').value = 4;
       }
 
+      aiSceneTitle = '';
       const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
       if (heading) heading.textContent = t.title + ' · 开张前测算';
       
