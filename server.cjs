@@ -628,7 +628,11 @@ const server = http.createServer((req, res) => {
   if (req.method === 'POST' && (pathname === '/api/extract' || pathname === '/kaizhangqian/api/extract')) {
     let body = '';
     let tooBig = false;
-    req.on('data', c => { body += c; if (body.length > 20000) { tooBig = true; req.destroy(); } });
+    req.on('data', c => {
+      if (tooBig) return; // 超限后不再累积，但继续接收亜量，保证能回响应
+      body += c;
+      if (body.length > 20000) { tooBig = true; body = ''; }
+    });
     req.on('end', async () => {
       if (tooBig) return sendJSON(res, 413, { error: { code: 'BODY_TOO_LARGE', message: '请求体过大' } });
       let text = '';
