@@ -1618,7 +1618,7 @@
         const labelEl = label.querySelector('.field-label');
         if (labelEl && labels[key]) {
           labelEl.textContent = ['price','sales','raw','pack'].includes(key)
-            ? labels[key].split(profile.unit).join(currentUnit) : labels[key];
+            ? labels[key].replace(new RegExp(profile.unit + '(?!量)', 'g'), currentUnit) : labels[key];
           if (profile.key === 'skill' && currentUnit !== '小时') {
             const serviceLabels = {price:`服务单价（元 / ${currentUnit}）`,sales:`预计日服务量（${currentUnit}）`,raw:`每${currentUnit}直接交付成本（元）`,pack:`每${currentUnit}交付耗材（元）`};
             if (serviceLabels[key]) labelEl.textContent = serviceLabels[key];
@@ -2433,7 +2433,7 @@
         const hidden = document.querySelector(`[data-field="${k}"]`)?.hidden;
         const value = hidden && inputEl?.value.trim() === '' ? '0' : (inputEl ? inputEl.value : '');
         if (value.trim() === '' || !Number.isFinite(+value) || +value < 0) {
-          $('error').textContent = `请补充「${document.querySelector(`[data-field="${k}"] .field-label`)?.textContent || k}」；没有此项支出请填写 0。`;
+          $('error').textContent = `请补充「${document.querySelector(`[data-field="${k}"] .field-label`)?.textContent || k}」；如没有请填写 0。`;
           if (inputEl?.closest('#fields-advanced')) $('advanced-details').open = true;
           inputEl?.focus();
           return;
@@ -2568,16 +2568,18 @@
             }
           }
         }
-        // 自定义场景：AI 未给出的结构性参数（营业天数/每日工时/折旧月数）给默认假设，
-        // 否则这三项为空会直接阻断“确认参数”，自定义场景就算不出结果。
+        // 自定义场景：AI 未给出的字段给默认假设，否则空值会直接阻断“确认参数”，
+        // 导致自定义场景算不出结果。结构项给合理值，其余按 0 计并标注“默认假设 · 待核对”。
         if (isCustomText) {
           const structuralDefaults = { days: 20, hours: 4, life: 24 };
-          for (const [k, dv] of Object.entries(structuralDefaults)) {
-            if ($(k) && String($(k).value).trim() === '') {
-              $(k).value = dv;
-              const srcEl = $('source-' + k);
-              if (srcEl) { srcEl.textContent = '默认假设 · 待核对'; srcEl.className = 'source'; }
-            }
+          // 收入驱动项（单价/交付量）缺失时必须让用户自己填：否则会静默算出 0 收入的假结果
+          const mustAskUser = new Set(['price', 'sales']);
+          for (const [k] of specs) {
+            if (!$(k) || String($(k).value).trim() !== '') continue;
+            if (mustAskUser.has(k)) continue;
+            $(k).value = (structuralDefaults[k] !== undefined) ? structuralDefaults[k] : 0;
+            const srcEl = $('source-' + k);
+            if (srcEl) { srcEl.textContent = '默认假设 · 待核对'; srcEl.className = 'source'; }
           }
         }
         // Service descriptions such as “清洁剂和包装成本” are normalized
