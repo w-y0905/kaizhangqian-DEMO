@@ -2459,7 +2459,10 @@
         const hidden = document.querySelector(`[data-field="${k}"]`)?.hidden;
         const value = hidden && inputEl?.value.trim() === '' ? '0' : (inputEl ? inputEl.value : '');
         if (value.trim() === '' || !Number.isFinite(+value) || +value < 0) {
-          $('error').textContent = `请补充「${document.querySelector(`[data-field="${k}"] .field-label`)?.textContent || k}」；如没有请填写 0。`;
+          const weekly = k === 'sales' && /每周|一周|每个?周|每周[一二三四五六日天]/.test(($('idea') && $('idea').value) || '');
+          $('error').textContent = weekly
+            ? '检测到你按「周」描述数量，请换算成「每天多少」（或补充每周实际营业天数）。'
+            : `请补充「${document.querySelector(`[data-field="${k}"] .field-label`)?.textContent || k}」；如没有请填写 0。`;
           if (inputEl?.closest('#fields-advanced')) $('advanced-details').open = true;
           inputEl?.focus();
           return;
@@ -2513,6 +2516,9 @@
         if (only && !only.has(k)) continue; // 与这门生意无关的项不列入缺项
         const wrap = document.querySelector(`[data-field="${k}"]`);
         if (wrap && wrap.hidden) continue; // 当前场景不显示的项不算
+        const srcEl = $('source-' + k);
+        // 已被 AI 追问回填/其它途径更新过的项自动移出（源标签不再是“默认假设”）
+        if (!srcEl || srcEl.textContent.trim() !== '默认假设 · 待核对') continue;
         out.push({ k, label: wrap?.querySelector('.field-label')?.textContent?.trim() || k });
       }
       return out;
@@ -2745,6 +2751,18 @@
           renderExpandableQuestions(qs);
         } else if ($('ai-questions-list')) {
           $('ai-questions-list').innerHTML = '<div class="hint">当前没有新增追问；请核对已识别字段和待补充项。</div>';
+        }
+
+        // 自定义场景：把“待补充的成本项”也列进追问区，点一下就能回答，答完自动回填
+        if (isCustomText && $('ai-questions-list')) {
+          const assumed = collectAssumedFields();
+          if (assumed.length) {
+            const list = $('ai-questions-list');
+            list.insertAdjacentHTML('beforeend',
+              '<div class="hint" style="margin:8px 0 4px;">以下成本项原文未提及，点一下即可补充（未补按 0 计）：</div>' +
+              assumed.map(f => `<div class="ai-question-pill"><span>📝 ${f.label}是多少？</span></div>`).join(''));
+            bindQuestionPillClick(list);
+          }
         }
 
         const recommendation = typeof data.recommendation === 'string' && data.recommendation.trim() ? (' AI建议：' + data.recommendation.trim()) : '';
