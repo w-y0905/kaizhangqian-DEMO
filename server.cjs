@@ -475,6 +475,31 @@ async function callAIClarify({ idea, question, reply, currentFields }) {
   }
 }
 
+// ── 提取结果缓存：同一段描述直接复用（含启动预热），降低响应延迟 ──
+const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 6 * 60 * 60 * 1000);
+const CACHE_MAX = Number(process.env.CACHE_MAX || 300);
+const aiCache = new Map();
+const cacheKey = t => String(t || '').replace(/\s+/g, ' ').trim();
+function cacheGet(k) {
+  const e = aiCache.get(k);
+  if (!e) return null;
+  if (Date.now() - e.at > CACHE_TTL_MS) { aiCache.delete(k); return null; }
+  aiCache.delete(k); aiCache.set(k, e); // LRU 触达
+  return e.value;
+}
+function cacheSet(k, v) {
+  aiCache.set(k, { at: Date.now(), value: v });
+  while (aiCache.size > CACHE_MAX) aiCache.delete(aiCache.keys().next().value);
+}
+// 首页内置的 5 个样例场景描述（启动时预热，让现场演示点击即出结果）
+const PRESET_TEXTS = [
+  '我想在校园摆摊卖柠檬茶，一杯卖8元，原料成本3元，每天卖30杯，每月营业20天，摊位费每月500元。',
+  '我想在宿舍卖零食礼包，每份卖15元，进货成本8元，每天预计卖20份，每月营业18天。',
+  '我想做大学生家教，每小时收费80元，每周接6小时，每周授课2天，每月授课4周，没有场地费。',
+  '我想在校园做证件照和毕业照摄影，每单平均收费60元，相纸和打印成本8元，每天接8单，每月服务22天，设备投入6000元，每天工作5小时。',
+  '我想在宿舍做洗鞋服务，每双收费25元，每天接12双，每月服务22天，清洁剂和包装成本5元，设备投入1500元，每天工作4小时。'
+];
+
 const server = http.createServer((req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
 
@@ -511,8 +536,15 @@ const server = http.createServer((req, res) => {
       try { const p = JSON.parse(body); text = typeof p.text === 'string' ? p.text.trim() : ''; } catch {}
       if (!text) return sendJSON(res, 400, { error: { code: 'INVALID_REQUEST', message: '缺少 text 字段' } });
 
+      const ck = cacheKey(text);
+      const hit = cacheGet(ck);
+      if (hit) {
+        res.setHeader('X-KZ-Cache', 'hit');
+        return sendJSON(res, 200, hit);
+      }
       try {
         const ai = await callAI(text);
+        if (ai && typeof ai.mode === 'string' && ai.mode.startsWith('openclaw')) cacheSet(ck, ai);
         return sendJSON(res, 200, ai);
       } catch (err) {
         // 不记录用户原文与密钥
@@ -552,3 +584,15 @@ server.on('error', e => {
 });
 server.on('listening', () => console.log('http://127.0.0.1:' + server.address().port));
 server.listen(PORT, '127.0.0.1');
+
+// 启动预热：后台把 5 个样例场景跑一遍写进缓存（不阻塞服务）
+(async () => {
+  let ok = 0;
+  for (const t of PRESET_TEXTS) {
+    try {
+      const v = await callAI(t);
+      if (v && typeof v.mode === 'string' && v.mode.startsWith('openclaw')) { cacheSet(cacheKey(t), v); ok++; }
+    } catch { /* 预热失败不影响服务 */ }
+  }
+  console.log('[cache] prewarmed ' + ok + '/' + PRESET_TEXTS.length + ' preset scenarios');
+})();
