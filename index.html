@@ -1095,6 +1095,7 @@
           <button type="button" class="scenario-pill" data-template="tutor">📚 技能家教课</button>
           <button type="button" class="scenario-pill" data-template="photo">📷 校园摄影</button>
           <button type="button" class="scenario-pill" data-template="wash">👟 宿舍洗鞋</button>
+          <button type="button" class="scenario-pill" data-template="custom">✏️ 自定义场景</button>
         </div>
       </div>
       <div class="hero-side">
@@ -2597,9 +2598,11 @@
         $('ai-mode-tag').textContent = modeLabel;
         $('ai-summary-text').textContent = `${modeLabel} 已识别为「${sceneProfile.label}」，提取 ${n} 个关键经营参数。请按当前场景核对下方成本与工时：`;
 
-        // 自定义输入：用 AI 识别出的场景简称做决策大盘标题（识别不出则退回“自定义场景”）
+        // 自定义输入：用 AI 识别出的场景简称做决策大盘标题（识别不出时退回识别到的场景类别）
         if (isCustomText) {
-          aiSceneTitle = (typeof data.title === 'string' && data.title.trim()) ? data.title.trim().slice(0, 16) : '';
+          const rawTitle = (typeof data.title === 'string' && data.title.trim()) ? data.title.trim() : '';
+          const sceneLabel = (sceneProfile && sceneProfile.label) ? String(sceneProfile.label).split('/')[0].trim() : '';
+          aiSceneTitle = (rawTitle || sceneLabel).slice(0, 16);
           const h = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
           if (h) h.textContent = (aiSceneTitle || '自定义场景') + ' · 开张前测算';
         }
@@ -3045,8 +3048,25 @@ ${decWhy}
     }
 
     document.querySelectorAll('[data-template]').forEach(b => {
-      b.onclick = () => applyTemplate(b.dataset.template);
+      b.onclick = () => {
+        if (b.dataset.template === 'custom') return enterCustomScenario();
+        return applyTemplate(b.dataset.template);
+      };
     });
+
+    // 自定义场景入口：只负责清空并聚焦输入框；场景识别、单位联动、追问生成全部复用原有逻辑
+    function enterCustomScenario() {
+      const ta = $('idea');
+      if (ta) {
+        ta.value = '';
+        ta.placeholder = '用日常语言描述你的生意，例如：宿舍打印、代写简历、校园贴膜、代取快递…';
+        ta.focus();
+      }
+      document.querySelectorAll('[data-template]').forEach(b => b.classList.toggle('active', b.dataset.template === 'custom'));
+      invalidateExtraction();
+      if ($('status')) $('status').textContent = '已切到自定义场景：直接描述你的生意，AI 会自动识别场景并补齐成本盲区。';
+      render();
+    }
 
     function applyUnit(unit) {
       if (!validUnit(unit)) return;

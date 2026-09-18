@@ -272,7 +272,7 @@ async function callAI(text) {
   "assumptions": [],
   "recommendation": ""
 }
-规则：title 为 4-10 字的经营场景简称（如"宠物代遛""快递代取""宿舍美甲"），概括用户描述的生意，无法概括时留空字符串；只填写原文明确给出的非负数字；未知字段不要猜，放入 missing；scene.key 必须从五个枚举中选择；questions 必须围绕该场景的成本和工作方式。price、raw、pack 按一次计价单位填写，sales 是每营业日的交付量，hours 是每日总工作小时。严格区分双、杯、条、单与工时；不要一律使用份。每周量需要实际每周营业天数才能转换；缺少因素时不要猜。raw 和 pack 不得重复计入同一笔耗材。
+规则：title 是根据用户描述概括出的 4-10 字经营场景简称（如"宠物代遛""快递代取""宿舍美甲"），**必须填写，不得留空**；只填写原文明确给出的非负数字；未知字段不要猜，放入 missing；scene.key 必须从五个枚举中选择；questions 必须围绕该场景的成本和工作方式。price、raw、pack 按一次计价单位填写，sales 是每营业日的交付量，hours 是每日总工作小时。严格区分双、杯、条、单与工时；不要一律使用份。每周量需要实际每周营业天数才能转换；缺少因素时不要猜。raw 和 pack 不得重复计入同一笔耗材。
 经营描述：${text}`;
     const r = await fetch(OPENCLAW_URL, {
       method: 'POST',
