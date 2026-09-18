@@ -2494,7 +2494,7 @@
       if (notice) {
         if (assumptionFields.length) {
           notice.hidden = false;
-          notice.textContent = `本次测算含 ${assumptionFields.length} 项默认假设（未识别成本按 0 计），结果仅供参考：${assumptionFields.map(f => f.label).join('、')}`;
+          notice.textContent = `本次测算含 ${assumptionFields.length} 项默认假设，结果仅供参考：${assumptionFields.map(f => f.label).join('、')}`;
         } else {
           notice.hidden = true;
         }
@@ -2507,6 +2507,12 @@
       if (e.target && e.target.dataset && e.target.dataset.assumed === '1') e.target.removeAttribute('data-assumed');
     });
 
+    // 从描述里取“每周 X”的数量（排除“每周 X 天”这种营业天数表达）
+    function weeklyQuantity(text) {
+      const m = /每(?:个)?周[^0-9]{0,12}?(\d+(?:\.\d+)?)\s*(?!天|日)/.exec(String(text || ''));
+      return m ? parseFloat(m[1]) : null;
+    }
+
     function collectAssumedFields() {
       const out = [];
       const only = customRelevant.length ? new Set(customRelevant) : null;
@@ -2517,8 +2523,8 @@
         const wrap = document.querySelector(`[data-field="${k}"]`);
         if (wrap && wrap.hidden) continue; // 当前场景不显示的项不算
         const srcEl = $('source-' + k);
-        // 已被 AI 追问回填/其它途径更新过的项自动移出（源标签不再是“默认假设”）
-        if (!srcEl || srcEl.textContent.trim() !== '默认假设 · 待核对') continue;
+        // 仍是“待核对”的默认假设才计入（被 AI 追问更新过的项自动移出）
+        if (!srcEl || !/待核对/.test(srcEl.textContent)) continue;
         out.push({ k, label: wrap?.querySelector('.field-label')?.textContent?.trim() || k });
       }
       return out;
@@ -2693,7 +2699,16 @@
         // 自定义场景：AI 未给出的字段给默认假设，否则空值会直接阻断“确认参数”，
         // 导致自定义场景算不出结果。结构项给合理值，其余按 0 计并标注“默认假设 · 待核对”。
         if (isCustomText) {
-          const structuralDefaults = { days: 20, hours: 4, life: 24 };
+          // 按“周”描述数量（如“每周卖15个”）：默认按每周营业 7 天平摊折算；
+          // 用户若回答追问，则由 AI 解读后覆盖此默认值。
+          const wk = weeklyQuantity(text);
+          if (wk && $('sales') && String($('sales').value).trim() === '') {
+            $('sales').value = Math.round((wk / 7) * 100) / 100;
+            const sEl = $('source-sales');
+            if (sEl) { sEl.textContent = `按每周 ${wk} 个 ÷ 7 天平摊折算 · 待核对`; sEl.className = 'source'; }
+            $('sales').dataset.assumed = '1';
+          }
+          const structuralDefaults = { days: wk ? 30 : 20, hours: 4, life: 24 };
           // 收入驱动项（单价/交付量）缺失时必须让用户自己填：否则会静默算出 0 收入的假结果
           const mustAskUser = new Set(['price', 'sales']);
           for (const [k] of specs) {
