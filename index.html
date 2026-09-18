@@ -1,0 +1,3097 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>开张前 · 先把账算清，再让好生意发生</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f766e'/%3E%3Cpath d='M14 44h36M20 44V20h24v24M26 38v-8m6 8v-14m6 14v-6' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='38' cy='28' r='4' fill='%23f59e0b'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-hover: #0d5a46;
+      --primary-light: #f0fdf4;
+      --primary-border: #bbf7d0;
+      
+      --accent: #d97706;
+      --accent-light: #fffbeb;
+      --accent-border: #fde68a;
+      
+      --ink: #0f172a;
+      --ink-secondary: #334155;
+      --muted: #64748b;
+      --muted-light: #94a3b8;
+      --line: #e2e8f0;
+      --line-subtle: #f1f5f9;
+      
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-subtle: #f8fafc;
+      
+      --danger: #e11d48;
+      --danger-light: #fff1f2;
+      --danger-border: #fecdd3;
+      
+      --success: #16a34a;
+      --success-light: #f0fdf4;
+      --success-border: #bbf7d0;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 12px 36px -4px rgba(15, 23, 42, 0.09), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+      --shadow-primary: 0 6px 20px -2px rgba(15, 118, 110, 0.3);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 0%, #ecfdf5 0%, transparent 40%),
+                  radial-gradient(circle at 90% 15%, #fffbeb 0%, transparent 35%),
+                  var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 max(24px, calc((100vw - 1280px) / 2));
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(15, 118, 110, 0.25);
+    }
+    header strong {
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      color: var(--ink);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    header strong span {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .header-btn {
+      min-height: 36px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .header-btn:hover {
+      background: var(--surface-subtle);
+      border-color: var(--muted-light);
+    }
+
+        @keyframes aiGlow {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); border-color: #10b981; }
+      50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.3); border-color: #10b981; }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .ai-updated-glow {
+      animation: aiGlow 2.5s ease-out;
+      border-color: #10b981 !important;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+    }
+
+    /* Hero Banner */
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 24px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(240,253,244,0.65));
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .hero h1 {
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.25;
+      margin: 0 0 6px;
+      letter-spacing: -0.8px;
+      color: var(--ink);
+    }
+    .hero p {
+      margin: 0;
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 640px;
+    }
+    .hero-side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ai-value-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(92px, 1fr));
+      gap: 6px;
+      width: min(360px, 100%);
+    }
+    .ai-value-strip > div {
+      padding: 8px 9px;
+      border: 1px solid var(--primary-border);
+      border-radius: 10px;
+      background: rgba(255,255,255,.72);
+      text-align: left;
+    }
+    .ai-value-strip b { display:block; color:var(--primary); font-size:11.5px; }
+    .ai-value-strip small { display:block; margin-top:3px; color:var(--muted); font-size:10.5px; line-height:1.25; }
+    @media (max-width: 600px) {
+      header { gap: 12px; min-height: 64px; }
+      .brand-wrap, .brand-icon { flex-shrink: 0; }
+      header strong { white-space: nowrap; }
+      header strong span, .header-actions > .badge-pill { display: none; }
+      .header-actions { margin-left: auto; flex-shrink: 0; }
+      .header-actions .header-btn { white-space: nowrap; min-height: 40px; padding: 6px 10px; }
+      .ai-value-strip { width: 100%; grid-template-columns: repeat(3, 1fr); }
+      .ai-value-strip > div { padding: 7px 6px; }
+      .ai-value-strip b { font-size: 10.5px; }
+      .ai-value-strip small { font-size: 9.5px; }
+    }
+
+    /* Scenario Quick Switcher */
+    .template-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .template-bar .hint {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .scenario-pill {
+      min-height: 36px;
+      padding: 5px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--shadow-sm);
+    }
+    .scenario-pill:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .scenario-pill.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: var(--shadow-primary);
+    }
+
+    /* Workspace Studio Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: 400px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-md);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .card:hover {
+      border-color: #cbd5e1;
+      box-shadow: var(--shadow-lg);
+    }
+    .card-header {
+      margin-bottom: 14px;
+    }
+    .step-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .step-tag::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    h2 {
+      font-size: 19px;
+      margin: 0;
+      letter-spacing: -0.3px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 6px 0;
+    }
+
+    /* Textarea & Buttons */
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      color: var(--ink);
+      background: #fafbf9;
+      font-size: 14px;
+      line-height: 1.55;
+      transition: all 0.2s ease;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 44px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      box-shadow: var(--shadow-primary);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px -2px rgba(15, 118, 110, 0.35);
+      filter: brightness(1.04);
+    }
+    .btn-primary:active { transform: translateY(0); filter: brightness(0.96); }
+    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+    /* AI Feedback Panel */
+    .ai-feedback-panel {
+      background: linear-gradient(145deg, #f0fdf4 0%, #ffffff 60%, #fffbeb 100%);
+      border: 1px solid rgba(187, 247, 208, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-feedback-panel::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), #10b981, var(--accent));
+    }
+    .ai-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .ai-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14.5px;
+      color: var(--primary-hover);
+    }
+    .ai-status-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      border-radius: 999px;
+    }
+    .ai-questions-list {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ai-question-pill {
+      font-size: 12px;
+      padding: 6px 10px;
+      background: #fff;
+      border: 1px solid #fed7aa;
+      border-radius: 6px;
+      color: #9a3412;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.45;
+    }
+    .ai-insight-box {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .ai-insight-item {
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .ai-insight-item.success { background: #f0fdf4; border-left: 3px solid var(--success); color: #166534; }
+    .ai-insight-item.warning { background: #fffbeb; border-left: 3px solid var(--accent); color: #92400e; }
+    .ai-insight-item.danger { background: #fff1f2; border-left: 3px solid var(--danger); color: #9f1239; }
+    .ai-insight-item.info { background: #f8fafc; border-left: 3px solid var(--primary); color: #1e293b; }
+    .ai-insight-title { font-weight: 700; margin-bottom: 2px; }
+
+    .scene-focus-panel {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: 1px solid #c7d2fe;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #eef2ff 0%, #ffffff 72%);
+    }
+    .scene-focus-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .scene-focus-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: #e0e7ff;
+      color: #3730a3;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .scene-focus-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .scene-focus-tag {
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+      padding: 4px 8px;
+      color: #4338ca;
+      background: rgba(255,255,255,.8);
+      font-size: 11.5px;
+      line-height: 1.35;
+    }
+
+    .ai-toggle-btn {
+      display: block;
+      width: 100%;
+      background: #fafbf9;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      text-align: center;
+      margin-top: 8px;
+      transition: all 0.15s ease;
+    }
+    .ai-toggle-btn:hover { background: var(--surface-subtle); border-color: var(--primary); }
+
+    /* Form Fields Grid */
+    .fields-core-grid, .fields-advanced-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .fields-advanced-grid { padding-top: 10px; }
+    #fields label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      display: block;
+    }
+    #fields input {
+      width: 100%;
+      margin-top: 4px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      color: var(--ink);
+      background: white;
+      min-height: 38px;
+      font-size: 13.5px;
+      font-variant-numeric: tabular-nums;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    #fields input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.15);
+    }
+    .source {
+      font-size: 11px;
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+      font-weight: 400;
+    }
+    .source.extracted { color: var(--primary); font-weight: 600; }
+
+    .advanced-params-details {
+      margin-top: 10px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-md);
+      background: #fafbf9;
+      padding: 8px 12px;
+      transition: background 0.2s ease;
+    }
+    .advanced-params-details[open] { background: white; border-style: solid; border-color: #cbd5e1; }
+    .advanced-summary {
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 32px;
+      user-select: none;
+    }
+    .advanced-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: #e2e8f0;
+      color: #475569;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+    .notice {
+      background: var(--accent-light);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #92400e;
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+
+    /* Right Column - Results Header */
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .toolbar button {
+      min-height: 36px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: white;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .toolbar button:hover {
+      background: var(--surface-subtle);
+      border-color: var(--muted-light);
+      transform: translateY(-1px);
+    }
+    .toolbar button[aria-pressed="true"] {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: var(--shadow-sm);
+      font-weight: 600;
+    }
+
+    /* Decision Certificate Banner */
+    .decision {
+      background: linear-gradient(135deg, #093b33 0%, #0f5a4c 50%, #15735f 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      margin: 14px 0 18px;
+      box-shadow: 0 10px 25px -4px rgba(15, 90, 76, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .decision strong {
+      display: block;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.3;
+      margin-bottom: 5px;
+      color: #ffffff;
+    }
+    .decision p {
+      margin: 0;
+      color: #d1fae5;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Metrics Grid (2x2) */
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .metric {
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      background: #fafbf9;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .metric:hover {
+      background: white;
+      border-color: #cbd5e1;
+      box-shadow: var(--shadow-sm);
+    }
+    .metric:first-child {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+      border-color: var(--primary-border);
+    }
+    .metric span {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+      margin: 2px 0 3px;
+    }
+    .metric:first-child strong { color: var(--primary-hover); }
+    .metric small { font-size: 11px; color: var(--muted); line-height: 1.35; }
+
+    /* Visual Gauges */
+    .viz-section {
+      background: #fafbf9;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin: 14px 0;
+    }
+    .viz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .viz-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .viz-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #ffe4e6; color: #be123c; }
+
+    .gauge-track {
+      height: 16px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+    }
+    .gauge-loss-bar { height: 100%; background: #fca5a5; transition: width 0.3s ease; }
+    .gauge-profit-bar { height: 100%; background: #86efac; transition: width 0.3s ease; }
+    .gauge-pin {
+      position: absolute;
+      top: -3px; bottom: -3px; width: 4px;
+      background: #0f172a; border-radius: 2px;
+      transition: left 0.3s ease;
+      box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    }
+    .gauge-scale {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cost-bar-track {
+      height: 22px;
+      background: #e2e8f0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+    }
+    .cost-seg {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      transition: width 0.3s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      padding: 0 4px;
+    }
+    .seg-raw { background: #f97316; }
+    .seg-pack { background: #06b6d4; }
+    .seg-fee { background: #8b5cf6; }
+    .seg-margin { background: #10b981; }
+    .cost-legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+    /* ===================================================
+       现代工作台 Segmented Studio Tabs
+       =================================================== */
+    .studio-tabs-nav {
+      display: flex;
+      gap: 6px;
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: var(--radius-md);
+      margin: 20px 0 16px;
+      border: 1px solid var(--line);
+    }
+    .studio-tab-btn {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .studio-tab-btn:hover { color: var(--ink); }
+    .studio-tab-btn.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .studio-tab-pane {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .studio-tab-pane.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Studio Module Card */
+    .studio-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Explanations & Verdicts inside Tabs */
+    .why-this-module {
+      font-size: 12.5px;
+      color: #1e3a8a;
+      background: #eff6ff;
+      border-left: 3px solid #3b82f6;
+      padding: 8px 12px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 8px 0 12px;
+      line-height: 1.55;
+    }
+    .scenario-verdict-box {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.5;
+    }
+    .scenario-verdict-box.safe { background: #f0fdf4; border: 1px solid var(--primary-border); color: #166534; }
+    .scenario-verdict-box.danger { background: #fff1f2; border: 1px solid var(--danger-border); color: #9f1239; }
+
+    /* 3-Dimensional Ratings */
+    .ai-dimensions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .dim-card {
+      background: #fafbf9;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+    }
+    .dim-title { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 3px; }
+    .dim-rating { font-size: 15px; font-weight: 800; color: var(--ink); }
+    .dim-rating.stars { color: #f59e0b; font-size: 13px; margin-top: 2px; }
+
+    .ai-callout {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #92400e;
+    }
+    .ai-callout strong { color: #78350f; }
+
+    .playbook-list { display: flex; flex-direction: column; gap: 6px; }
+    .playbook-item {
+      background: #fafbf9;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-size: 12.5px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .playbook-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Breakdown Table */
+    .breakdown-table { margin-top: 14px; }
+    .breakdown {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--line-subtle);
+      font-size: 13.5px;
+    }
+    .breakdown:last-child { border-bottom: none; }
+    .breakdown span { color: var(--ink-secondary); }
+    .breakdown strong { font-size: 14.5px; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .breakdown strong.negative { color: var(--danger); }
+    .breakdown strong.positive { color: var(--success); }
+
+    /* Formula Accordion */
+    details {
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    summary {
+      cursor: pointer;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      user-select: none;
+    }
+    summary:hover { color: var(--primary); }
+    #formula {
+      background: #fafbf9;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin: 8px 0;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      margin-top: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    tr.clickable-scenario-row {
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    tr.clickable-scenario-row:hover td {
+      background: #f1f5f9;
+    }
+    tr.active-scenario-row td {
+      background: rgba(15, 118, 110, 0.08) !important;
+      font-weight: 600;
+    }
+    tr.active-scenario-row:hover td {
+      background: rgba(15, 118, 110, 0.13) !important;
+    }
+    th:first-child, td:first-child { text-align: left; }
+    th { background: #fafbf9; font-size: 12px; font-weight: 600; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      margin: 10px 0;
+      line-height: 1.5;
+      color: var(--ink-secondary);
+    }
+    .check input { min-width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary); cursor: pointer; }
+
+    footer {
+      max-width: 1280px;
+      margin: 36px auto 0;
+      padding: 20px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+    #error { color: var(--danger); font-size: 13px; font-weight: 500; margin: 6px 0; }
+    .print-only { display: none; }
+
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .hero-side { align-items: flex-start; }
+      main { padding: 16px 14px 50px; }
+      header { padding: 0 16px; }
+      .ai-dimensions-grid { grid-template-columns: 1fr; }
+      .studio-tabs-nav { flex-wrap: wrap; }
+    }
+    @media (max-width: 600px) {
+      .fields-core-grid, .fields-advanced-grid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric strong { font-size: 21px; }
+      .card, .studio-card { padding: 16px; border-radius: var(--radius-md); }
+      .result-head { flex-direction: column; }
+      .result-head .toolbar { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+      .result-head .toolbar button { justify-content: center; }
+    }
+    @media (max-width: 380px) {
+      .metrics { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: white; color: black; font-size: 12px; }
+      header, .hero, .input-panel, .toolbar, #export, .scenario-pill, .studio-tabs-nav { display: none !important; }
+      .grid { display: block; }
+      main { padding: 0; max-width: 100%; }
+      .card, .studio-card { border: 1px solid #ccc; box-shadow: none; break-inside: avoid; margin-bottom: 12px; padding: 14px; }
+      .studio-tab-pane { display: block !important; }
+      .decision { background: #f8fafc !important; color: black !important; border: 2px solid #0f766e !important; box-shadow: none; }
+      .decision strong { color: black !important; }
+      .decision p { color: #444 !important; }
+      .print-only { display: block; font-size: 11px; color: #666; margin: 10px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-icon">开</div>
+      <strong>开张前<span>· 青年商业精算引擎</span></strong>
+    </div>
+    <div class="header-actions">
+      <span class="badge-pill">校园微创业 / 决策原型</span>
+      <button class="header-btn" id="export" type="button">打印 / 导出 PDF</button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main>
+    <!-- Hero Banner -->
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Before Your First Sale</div>
+        <h1>先把账算清，<br>再让好生意发生。</h1>
+        <p>面向<strong>有想法但缺少财务经验的大一、大二学生</strong>：在第一次投入资金前，用一句话说清生意，让 AI 帮你补齐成本，再用可核验公式算清保本底线与时间回报。</p>
+        <div class="notice" style="margin-top:12px; max-width:680px;">
+          <strong>我们解决的不是“再做一个计算器”：</strong>Excel 要先懂公式，通用 AI 可能直接猜数字；“开张前”把<strong>场景理解、成本查漏、追问补全</strong>交给 AI，把金额计算交给确定性模型，每个结果都能回到输入来源核对。
+        </div>
+        
+        <!-- Scenario Pills -->
+        <div class="template-bar" aria-label="快速开始模板">
+          <span class="hint">切换行业场景：</span>
+          <button type="button" class="scenario-pill active" data-template="lemon">🍋 校园柠檬茶</button>
+          <button type="button" class="scenario-pill" data-template="snack">🍪 宿舍零食铺</button>
+          <button type="button" class="scenario-pill" data-template="tutor">📚 技能家教课</button>
+          <button type="button" class="scenario-pill" data-template="photo">📷 校园摄影</button>
+          <button type="button" class="scenario-pill" data-template="wash">👟 宿舍洗鞋</button>
+        </div>
+      </div>
+      <div class="hero-side">
+        <span class="badge-pill">💡 AI 辅助建模 · 财管复算</span>
+        <div class="ai-value-strip" aria-label="AI核心能力">
+          <div><b>① 听懂场景</b><small>饮品 / 零售 / 服务</small></div>
+          <div><b>② 找出漏项</b><small>包装、损耗、工时</small></div>
+          <div><b>③ 算清底线</b><small>公式可追溯</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Workspace Grid -->
+    <div class="grid">
+      <!-- Left Column: Input & AI Advisor Panel -->
+      <aside class="input-panel">
+        
+        <!-- Step 01: Input Natural Language -->
+        <section class="card">
+          <div class="card-header">
+            <div class="step-tag">Step 01 / 描述你的生意</div>
+            <h2>你想做什么？</h2>
+          </div>
+          <label for="idea" class="hint">用日常语言描述你想卖什么、卖多少钱、进价多少以及预计销量：</label>
+          <div class="prompt-box">
+            <textarea id="idea" placeholder="例如：我想在校园摆摊卖柠檬茶，一杯卖8元，原料成本3元，每天卖30杯，每月营业20天，摊位费每月500元。">我想在校园摆摊卖柠檬茶，一杯卖8元，原料成本3元，每天卖30杯，每月营业20天，摊位费每月500元。</textarea>
+          </div>
+          <button id="parse" class="btn-primary" type="button">✨ 智能提取已知信息</button>
+          <p id="status" class="hint" role="status" style="margin-top: 8px; font-weight: 500;"></p>
+        </section>
+
+        <!-- Step 02: AI Feedback & Cost Leak Detection -->
+        <section class="card ai-feedback-panel" id="ai-feedback-card">
+          <div class="ai-header">
+            <div class="ai-title">🤖 AI 商业顾问排查</div>
+            <span class="ai-status-tag" id="ai-mode-tag">OpenClaw / DeepSeek</span>
+          </div>
+          <p class="hint" id="ai-summary-text">已接入 DeepSeek 大模型：输入经营描述并点击“智能提取”，AI 会识别经营场景、提取已知参数，并针对你的成本盲区生成追问。</p>
+          
+          <div id="ai-questions-container">
+            <div class="ai-questions-list" id="ai-questions-list">
+              <div class="ai-question-pill" style="cursor:default;">💡 点击“智能提取”后，AI 会在这里列出针对你经营场景的成本追问，可逐条点击回复补充参数。</div>
+            </div>
+          </div>
+
+                    <!-- AI 交互答疑与参数自动修正卡片 -->
+          <div class="ai-interactive-reply-card" id="ai-reply-card" style="margin-top: 14px; background: rgba(255, 255, 255, 0.95); border: 1px solid var(--primary-border); border-radius: var(--radius-md); padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 13px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 6px;">
+                <span>💬</span> 回复 AI 追问 / 补充经营细节
+              </span>
+              <span id="reply-target-tag" style="font-size: 11px; padding: 2px 8px; background: var(--primary-light); color: var(--primary); border: 1px solid var(--primary-border); border-radius: 999px; font-weight: 600;">
+                多套餐/盲区答疑
+              </span>
+            </div>
+
+            <p class="hint" style="margin: 0 0 8px; font-size: 12px; color: var(--muted); line-height: 1.45;">
+              针对上方追问（如不同套餐单价比例、真实耗材或工时），直接回复，AI 将<strong>自动加权折算并填入表单</strong>：
+            </p>
+
+            <textarea id="ai-reply-input" placeholder="例如：“8单里大概6单是证件照35元，2单是毕业照套餐128元” 或 “耗材相纸每单约3元，每天修图加拍照要7小时”..." style="min-height: 62px; font-size: 13px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); width: 100%; resize: vertical; line-height: 1.45;"></textarea>
+
+            <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px;" id="reply-quick-chips">
+              <button type="button" class="header-btn chip-btn" data-preset="8单里大概6单是证件照35元，2单是毕业照套餐128元" style="min-height: 24px; padding: 1px 7px; font-size: 11px; border-radius: 999px;">
+                📸 填入双套餐组合 (6单@35 + 2单@128)
+              </button>
+              <button type="button" class="header-btn chip-btn" data-preset="每单耗材相纸成本3元，相框包装5元" style="min-height: 24px; padding: 1px 7px; font-size: 11px; border-radius: 999px;">
+                📦 耗材与相框包装拆分
+              </button>
+              <button type="button" class="header-btn chip-btn" data-preset="拍摄加后期精修磨皮，每天实际工时需要7小时" style="min-height: 24px; padding: 1px 7px; font-size: 11px; border-radius: 999px;">
+                ⏱ 校准每日真实工时
+              </button>
+            </div>
+
+            <button type="button" id="btn-submit-reply" class="btn-primary" style="margin-top: 8px; min-height: 36px; font-size: 13.5px;">
+              🤖 提交回答，让 AI 智能解析并自动更新参数
+            </button>
+
+            <div id="reply-feedback-box" style="display: none; margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12.5px; line-height: 1.5;"></div>
+          </div>
+
+          <!-- AI 初步经营策略诊断 (绿色卡片) -->
+          <div class="ai-insight-box" id="ai-advice-box" style="margin-top: 12px;">
+            <div class="step-tag" style="color: var(--primary);">AI 初步策略诊断</div>
+            <div id="ai-advice-content">
+              <div class="ai-insight-item success">
+                <div class="ai-insight-title">等待你的经营描述</div>
+                <div class="ai-insight-desc">完成一次 AI 提取并确认参数后，这里会展示场景判断、成本漏项提醒和可执行建议。页面中的初始数字仅用于演示交互，不能当作真实经营数据。</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="scene-focus-panel" id="scene-focus-panel" aria-live="polite">
+            <div class="scene-focus-head">
+              <span class="step-tag" style="color: var(--primary); margin: 0;">当前场景关注点</span>
+              <span class="scene-focus-badge" id="scene-focus-badge">饮品 / 食品</span>
+            </div>
+            <p class="hint" id="scene-focus-summary">识别场景后，这里会切换为对应行业的成本和经营重点。</p>
+            <div class="scene-focus-tags" id="scene-focus-tags"></div>
+          </div>
+        </section>
+
+        <!-- Step 03: Parameter Verification Deck (精简 3+N 模式) -->
+        <section class="card">
+          <div class="card-header">
+            <div class="step-tag">Step 03 / 核对成本与假设</div>
+            <h2>核心经营参数</h2>
+          </div>
+            <div class="notice" id="scenario-notice">
+              已根据当前场景精简参数。先核对核心 3~4 项，其余细分成本可在折叠栏中展开微调。<strong>带“演示假设·待核对”标记的数字不是实际经营数据。</strong>
+            </div>
+          <form id="form" novalidate>
+            <div class="fields-core-grid" style="margin-bottom:16px">
+              <label for="scene-kind">经营方式<select id="scene-kind" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px">
+                <option value="beverage">饮品 / 食品</option><option value="retail">零售 / 电商</option><option value="skill">技能 / 教学服务</option><option value="creative">按单交付服务</option><option value="other">其他经营场景</option>
+              </select></label>
+              <label for="business-unit">计价单位<input id="business-unit" value="杯" maxlength="8" placeholder="例如：双、小时、单、套" style="width:100%"></label>
+            </div>
+            <p class="hint">AI 识别后可校正经营方式和计价单位。售价、直接成本与交付量须使用同一单位；工时始终按小时填写。</p>
+            <div id="fields">
+              <!-- Core 4 fields (Price, Sales, Raw/Cost, Days) -->
+              <div class="fields-core-grid" id="fields-core"></div>
+
+              <!-- Collapsible Advanced Fields -->
+              <details class="advanced-params-details" id="advanced-details">
+                <summary class="advanced-summary">
+                  <span>⚙️ 进阶隐藏成本（包装/损耗/设备/折旧/时薪）</span>
+                  <span class="advanced-tag" id="advanced-count-tag">9 项已预设</span>
+                </summary>
+                <div class="fields-advanced-grid" id="fields-advanced"></div>
+              </details>
+            </div>
+
+            <p id="error" role="alert"></p>
+            <button class="btn-primary" type="submit">确认参数，更新测算</button>
+          </form>
+        </section>
+
+      </aside>
+
+      <!-- Right Column: Decision Studio & Visualization Dashboard -->
+      <div>
+        
+        <!-- Step 04: Decision Report & KPI Metrics (Cockpit 顶部核心大盘) -->
+        <section class="card" style="margin-bottom: 16px;">
+          <div class="result-head">
+            <div>
+              <div class="step-tag">Decision Studio / 商业决策大盘</div>
+              <h2>校园柠檬茶 · 开张前测算</h2>
+              <p class="hint" id="scenario-label" style="font-weight: 500;"></p>
+            </div>
+            <div class="toolbar">
+              <button id="copy-summary" type="button">📋 复制报告摘要</button>
+            </div>
+          </div>
+
+          <p class="print-only">演示原型：AI 负责理解非结构化描述并识别缺失项，财务结果由确定性公式计算；初始数据为演示假设。</p>
+
+          <!-- Core Decision Banner -->
+          <div id="decision" class="decision" aria-live="polite"></div>
+
+          <!-- 4 Main KPI Cards -->
+          <div class="metrics" id="metrics"></div>
+
+          <!-- Breakeven Safety Gauge (自适应单位) -->
+          <div class="viz-section" id="breakeven-viz">
+            <div class="viz-header">
+              <span class="viz-title">📊 保本水位线与安全边际</span>
+              <span class="viz-badge badge-success" id="gauge-badge">安全边际率: 33.3%</span>
+            </div>
+            <div class="gauge-track">
+              <div class="gauge-loss-bar" id="gauge-loss" style="width: 66%;"></div>
+              <div class="gauge-profit-bar" id="gauge-profit" style="width: 34%;"></div>
+              <div class="gauge-pin" id="gauge-pin" style="left: 66%;" title="保本线"></div>
+            </div>
+            <div class="gauge-scale">
+              <span>0 <span class="unit-text">杯</span></span>
+              <span id="gauge-be-label">保本线: 20 杯</span>
+              <span id="gauge-target-label">预计日销: 30 杯</span>
+            </div>
+          </div>
+
+          <!-- Unit Cost Anatomy Bar (自适应服务/零售) -->
+          <div class="viz-section" id="cost-viz">
+            <div class="viz-header">
+              <span class="viz-title" id="cost-viz-title">💰 单件价格与成本结构</span>
+              <span class="viz-badge badge-success" id="cost-margin-pct">毛利率: 52.5%</span>
+            </div>
+            <div class="cost-bar-track">
+              <div class="cost-seg seg-raw" id="seg-raw" style="width: 41%;">原料 41%</div>
+              <div class="cost-seg seg-pack" id="seg-pack" style="width: 6.5%;">包装 6.5%</div>
+              <div class="cost-seg seg-fee" id="seg-fee" style="width: 0%;">抽成 0%</div>
+              <div class="cost-seg seg-margin" id="seg-margin" style="width: 52.5%;">毛利 52.5%</div>
+            </div>
+            <div class="cost-legend" id="cost-legend">
+              <div class="legend-item" id="leg-raw"><span class="legend-dot seg-raw"></span> 原料(含损耗)</div>
+              <div class="legend-item" id="leg-pack"><span class="legend-dot seg-pack"></span> 包装耗材</div>
+              <div class="legend-item" id="leg-fee"><span class="legend-dot seg-fee"></span> 平台抽成</div>
+              <div class="legend-item" id="leg-margin"><span class="legend-dot seg-margin"></span> 边际毛利空间</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+             现代工作台分段选项卡 (Segmented Studio Tabs)
+             =================================================== -->
+        <div class="studio-tabs-nav" role="tablist">
+          <button type="button" class="studio-tab-btn active" data-tab="tab-ai">
+            <span>🧠</span> AI 深度穿透与收支
+          </button>
+          <button type="button" class="studio-tab-btn" data-tab="tab-stress">
+            <span>🛡</span> 压力测试与敏感性
+          </button>
+          <button type="button" class="studio-tab-btn" data-tab="tab-trial">
+            <span>📝</span> 实测打卡与行动
+          </button>
+        </div>
+
+        <!-- ===================================================
+             Tab Pane 1: AI 深度穿透与收支明细
+             =================================================== -->
+        <div class="studio-tab-pane active" id="tab-ai">
+          <div class="studio-card">
+            <div class="result-head" style="margin-bottom: 12px;">
+              <h2>🧠 AI 商业数据深度穿透诊断</h2>
+              <button type="button" class="header-btn" id="trigger-ai-analysis" style="color: var(--primary); font-weight: 600;">✨ 刷新深度诊断</button>
+            </div>
+
+            <!-- 3-Dimensional Physical Ratings -->
+            <div class="ai-dimensions-grid">
+              <div class="dim-card">
+                <div class="dim-title">盈利能力 (毛利空间)</div>
+                <div class="dim-rating" id="dim-margin-text">稳健微利</div>
+                <div class="dim-rating stars" id="dim-margin-stars">★★★★☆</div>
+              </div>
+              <div class="dim-card">
+                <div class="dim-title">抗风险韧性 (安全边际)</div>
+                <div class="dim-rating" id="dim-risk-text">中等安全垫</div>
+                <div class="dim-rating stars" id="dim-risk-stars">★★★☆☆</div>
+              </div>
+              <div class="dim-card">
+                <div class="dim-title">时间性价比 (时薪博弈)</div>
+                <div class="dim-rating" id="dim-time-text">优于兼职</div>
+                <div class="dim-rating stars" id="dim-time-stars">★★★★☆</div>
+              </div>
+            </div>
+
+            <!-- Key Sensitivity Leverage Callout -->
+            <div class="ai-callout" id="ai-leverage-callout">
+              <strong>💡 关键利润杠杆洞察：</strong>
+              <span id="ai-leverage-text">在当前模型中，提高客单价比死拼出摊销量的利润弹性更高。每提价 1 元，相当于每天多卖 5 杯的月现金净增量。</span>
+            </div>
+
+            <!-- Actionable Playbook (with expand toggle) -->
+            <div class="playbook-list" id="ai-playbook-list"></div>
+          </div>
+
+          <!-- Detailed Breakdown Table -->
+          <div class="studio-card">
+            <h2>📑 月度收支与成本明细</h2>
+            <div class="breakdown-table" id="breakdown"></div>
+
+            <!-- Formula Details Accordion -->
+            <details>
+              <summary>查看确定性计算公式与适用边界</summary>
+              <div id="formula"></div>
+              <p style="margin-top: 10px; line-height: 1.6;">按单一商品、稳定价格与销量估算；原料损耗率指采购原料中损耗的比例。未计税费、融资成本、赊销、库存变化与残值；全部销售当月收款。初始投入假设为一次性设备款，直线折旧；现金回收期不重复扣除折旧。兼职机会成本单独比较，不混入现金支出。不能据此保证收益或判断是否允许经营。</p>
+            </details>
+          </div>
+        </div>
+
+        <!-- ===================================================
+             Tab Pane 2: 压力测试与关键敏感性排序
+             =================================================== -->
+        <div class="studio-tab-pane" id="tab-stress">
+          <!-- Step 06: Pressure Testing -->
+          <div class="studio-card">
+            <div class="card-header">
+              <div class="step-tag">Step 06 / 压力测试</div>
+              <h2>少卖一点，还能撑住吗？</h2>
+            </div>
+            <div class="why-this-module">
+              💡 <strong>这个模块有什么用？</strong>新手最容易过度乐观。此模块模拟在<strong>刮风下雨、考试周或客流低谷（销量打8折）</strong>时，你是否仍能保本生存，避免盲目备货导致开张即亏损。
+            </div>
+            <div id="scenario-verdict" class="scenario-verdict-box safe">
+              🛡 正在测算当前销量情景…
+            </div>
+            <p class="hint">切换不同情景，整份报告与图表将同步联动：</p>
+            <div class="toolbar" id="scenarios" style="margin-bottom: 12px; align-items: center; flex-wrap: wrap;">
+              <button data-factor="0.8" aria-pressed="false" type="button">销量下降 20%</button>
+              <button data-factor="1" aria-pressed="true" type="button">基准销量</button>
+              <button data-factor="1.2" aria-pressed="false" type="button">销量增加 20%</button>
+              <button id="btn-custom-factor" type="button" aria-pressed="false">⚙️ 自定义情景</button>
+            </div>
+
+            <!-- 自定义情景抽屉 / 输入框 -->
+            <div id="custom-scenario-drawer" style="display: none; background: #f8fafc; border: 1px solid var(--primary-border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; box-shadow: var(--shadow-sm);">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span style="font-size: 13px; font-weight: 700; color: var(--primary);">🎯 自定义销量变动：</span>
+                  <div style="display: inline-flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: var(--muted);">增减比例:</span>
+                    <input type="number" id="custom-factor-pct" value="-30" step="5" style="width: 72px; height: 32px; padding: 2px 6px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; text-align: center; font-weight: 700; color: var(--ink);">
+                    <span style="font-size: 12px; font-weight: 600; color: var(--ink-secondary);">%</span>
+                  </div>
+                  <span style="color: var(--muted); font-size: 12px;">或</span>
+                  <div style="display: inline-flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: var(--muted);">直接指定日销:</span>
+                    <input type="number" id="custom-factor-qty" placeholder="如 21" step="0.5" style="width: 78px; height: 32px; padding: 2px 6px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; text-align: center; font-weight: 700; color: var(--ink);">
+                    <span id="custom-factor-unit" style="font-size: 12px; font-weight: 600; color: var(--ink-secondary);">杯</span>
+                  </div>
+                  <button type="button" id="apply-custom-factor" class="header-btn" style="min-height: 32px; padding: 4px 14px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm);">应用并测算</button>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <span style="font-size: 11.5px; color: var(--muted);">快捷预设:</span>
+                  <button type="button" class="header-btn quick-factor-btn" data-pct="-50" style="min-height: 26px; padding: 2px 8px; font-size: 11.5px;">-50% 极寒</button>
+                  <button type="button" class="header-btn quick-factor-btn" data-pct="-30" style="min-height: 26px; padding: 2px 8px; font-size: 11.5px;">-30% 低谷</button>
+                  <button type="button" class="header-btn quick-factor-btn" data-pct="30" style="min-height: 26px; padding: 2px 8px; font-size: 11.5px;">+30% 促销</button>
+                  <button type="button" class="header-btn quick-factor-btn" data-pct="50" style="min-height: 26px; padding: 2px 8px; font-size: 11.5px;">+50% 爆单</button>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>情景</th>
+                    <th>日销量</th>
+                    <th>月现金结余</th>
+                    <th>扣折旧后盈余</th>
+                  </tr>
+                </thead>
+                <tbody id="scenario-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Step 07: Sensitivity Ranking -->
+          <div class="studio-card" id="impact-card">
+            <div class="card-header">
+              <div class="step-tag">Step 07 / 哪个假设最关键</div>
+              <h2>关键参数敏感性排序</h2>
+            </div>
+            <div class="why-this-module">
+              💡 <strong>这个模块有什么用？（抓大放小指南）</strong>开店有十几项支出，你的时间极其有限。此榜单测算每个参数变动 10% 对月利润的冲击力。<strong>排在第 1 位的才是你的核心利润抓手</strong>（通常是提价或压降原料），切勿把过多精力消耗在影响仅几十元的次要细节上。
+            </div>
+            <div id="impact-leverage-tip" class="scenario-verdict-box safe" style="margin-bottom: 12px;"></div>
+            <div id="impact-list" class="breakdown-table"></div>
+          </div>
+        </div>
+
+        <!-- ===================================================
+             Tab Pane 3: 实地试卖与行动清单
+             =================================================== -->
+        <div class="studio-tab-pane" id="tab-trial">
+          <!-- Step 08: Action Checklist -->
+          <div class="studio-card" id="action-card">
+            <div class="card-header">
+              <div class="step-tag">Step 08 / 行动建议</div>
+              <h2>开张前核实清单</h2>
+            </div>
+            <p class="hint">将测算假设转化为真实商业证据的执行清单：</p>
+            <div id="action-list"></div>
+          </div>
+
+          <!-- Step 09: Trial Logging -->
+          <div class="studio-card" id="trial-card">
+            <div class="card-header">
+              <div class="step-tag">Step 09 / 真实试卖验证</div>
+              <h2>记录真实的一天</h2>
+            </div>
+            <p class="hint">数据保存在本地浏览器，用于与基准假设比对，检验模型准确性：</p>
+            <div class="fields-core-grid">
+              <label>出摊日期<input id="trial-date" type="date"></label>
+              <label>实际销量（<span class="unit-text">杯</span>）<input id="trial-sales" type="number" min="0"></label>
+              <label>实际总营收（元）<input id="trial-revenue" type="number" min="0" step="0.01"></label>
+              <label>实际耗材成本（元）<input id="trial-cost" type="number" min="0" step="0.01"></label>
+              <label>总工时（小时）<input id="trial-hours" type="number" min="0" step="0.5"></label>
+              <label>出摊环境备注<input id="trial-note" type="text" maxlength="80" placeholder="天气、人流、突发情况"></label>
+            </div>
+            <button id="add-trial" type="button" class="btn-primary" style="margin-top: 12px;">保存实测数据</button>
+            <p id="trial-summary" class="hint" style="margin-top: 8px; font-weight: 500;"></p>
+            <div id="trial-list" class="breakdown-table" style="margin-top: 10px;"></div>
+          </div>
+
+          <!-- Step 10: Save Plans -->
+          <div class="studio-card" id="save-card">
+            <div class="card-header">
+              <div class="step-tag">Step 10 / 保存与复盘</div>
+              <h2>把这次测算留下来</h2>
+            </div>
+            <p class="hint">方案仅保存在当前浏览器，可随时加载对比不同的经营构想：</p>
+            <div class="toolbar">
+              <button id="save-plan" type="button">💾 保存当前方案</button>
+              <button id="export-json" type="button">📥 导出 JSON 数据</button>
+              <button id="clear-plans" type="button">🗑 清空历史</button>
+            </div>
+            <div id="saved-plans" class="hint" style="margin-top: 12px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      开张前 · 青年创业商业推演原型 v1.0 ｜ 本地计算模型与确定性财管公式推演 ｜ 报告用于辅助创业决策与财商实训
+    </footer>
+  </main>
+
+  <script>
+    const SCENE_PROFILES = {
+      beverage: {
+        key: 'beverage', label: '饮品 / 食品', unit: '杯', kind: 'product',
+        title: '校园饮品 / 食品', summary: '重点核对单杯直接成本、鲜品损耗、包装耗材和高峰时段日销。',
+        tags: ['原料与损耗', '杯具包装', '摊位 / 校园准入', '高峰客流'],
+        labels: { price: '售价（元 / 杯）', sales: '预计日销量（杯）', raw: '直接原料成本（元 / 杯）', days: '月营业天数', pack: '包装耗材（元 / 杯）', loss: '原料损耗率（%）', fee: '平台 / 支付抽成率（%）', rent: '月摊位或场地费（元）', other: '其他月固定现金支出（元）', investment: '初始设备投入（元）', life: '设备折旧年限（月）', hours: '每日投入总工时（小时）', wage: '兼职参考时薪（元 / 小时）' },
+        hide: []
+      },
+      retail: {
+        key: 'retail', label: '零售 / 电商', unit: '份', kind: 'product',
+        title: '零售 / 电商小生意', summary: '重点核对进货价、包装履约、滞销损耗、平台佣金和库存周转。',
+        tags: ['进货与库存', '快递 / 包装', '平台佣金', '滞销风险'],
+        labels: { price: '每份商品售价（元）', sales: '预计日销量（份）', raw: '每份进货成本（元）', days: '月经营天数', pack: '每份履约包装（元）', loss: '库存 / 滞销损耗率（%）', fee: '平台佣金率（%）', rent: '月仓储或场地费（元）', other: '其他月固定现金支出（元）', investment: '初始备货与设备投入（元）', life: '设备折旧年限（月）', hours: '每日投入总工时（小时）', wage: '兼职参考时薪（元 / 小时）' },
+        hide: []
+      },
+      skill: {
+        key: 'skill', label: '技能 / 教学服务', unit: '小时', kind: 'service',
+        title: '技能 / 教学服务', summary: '重点核对课时单价、可交付小时、备课与通勤时间，以及获客平台成本。',
+        tags: ['课时单价', '可交付工时', '备课 / 通勤', '平台获客'],
+        labels: { price: '课时单价（元 / 小时）', sales: '预计日服务时长（小时）', raw: '每小时材料 / 交通成本（元）', days: '月服务天数', pack: '交付耗材（元 / 小时）', loss: '取消 / 空档损耗率（%）', fee: '平台 / 获客抽成率（%）', rent: '月场地或交通固定支出（元）', other: '其他月固定现金支出（元）', investment: '初始设备投入（元）', life: '设备折旧年限（月）', hours: '每日投入总工时（小时）', wage: '兼职参考时薪（元 / 小时）' },
+        hide: ['pack', 'loss']
+      },
+      creative: {
+        key: 'creative', label: '创意 / 到店服务', unit: '单', kind: 'service',
+        title: '创意 / 到店服务', summary: '重点核对每单服务价、耗材与交付成本、完整工时和设备维护。',
+        tags: ['每单服务价', '直接耗材', '完整交付工时', '设备回收'],
+        labels: { price: '每单服务价（元 / 单）', sales: '预计日接单量（单）', raw: '每单直接耗材成本（元）', days: '月服务天数', pack: '每单交付包装（元）', loss: '返工 / 损耗率（%）', fee: '平台 / 获客抽成率（%）', rent: '月场地或工作室费（元）', other: '其他月固定现金支出（元）', investment: '初始设备投入（元）', life: '设备折旧年限（月）', hours: '每日投入总工时（小时）', wage: '兼职参考时薪（元 / 小时）' },
+        hide: []
+      },
+      other: {
+        key: 'other', label: '其他经营场景', unit: '单', kind: 'other',
+        title: '自定义经营场景', summary: '先把每单收入、直接成本、交付量和总工时说清，再补充一次性投入。',
+        tags: ['每单收入', '直接成本', '交付量', '时间回报'],
+        labels: { price: '每单收入（元 / 单）', sales: '预计日交付量（单）', raw: '每单直接成本（元）', days: '月经营天数', pack: '每单耗材 / 包装（元）', loss: '损耗 / 返工率（%）', fee: '平台 / 支付抽成率（%）', rent: '月场地或固定支出（元）', other: '其他月固定现金支出（元）', investment: '初始投入（元）', life: '投入折旧年限（月）', hours: '每日投入总工时（小时）', wage: '兼职参考时薪（元 / 小时）' },
+        hide: []
+      }
+    };
+
+    let sceneProfile = SCENE_PROFILES.beverage;
+    let currentUnit = sceneProfile.unit, pendingReview = false;
+    let extractionController = null, extractionVersion = 0, sceneVersion = 0;
+    const safeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const validUnit = value => /^[\p{L}]{1,8}$/u.test(String(value || '')) ? String(value) : '';
+    function inferTransactionUnit(text = '') {
+      const units = '(人次|小时|课时|公斤|千克|公里|分钟|双|杯|份|件|单|次|套|条|张|本|台|个|瓶|盒|斤|米)';
+      const price = String(text).match(new RegExp('(?:每|一)' + units + '(?:平均)?(?:收费|售价|卖价|卖|收|价格|定价)?\\s*\\d+(?:\\.\\d+)?\\s*元'));
+      const reversed = String(text).match(new RegExp('\\d+(?:\\.\\d+)?\\s*元\\s*[/／]\\s*' + units));
+      const volume = String(text).match(new RegExp('(?:每天|每日|一天)[^，。；\\n]{0,12}?(?:卖|销售|接|交付|完成|洗)\\s*\\d+(?:\\.\\d+)?\\s*' + units));
+      return (price || reversed || volume)?.[1] || '';
+    }
+
+    function detectSceneFromText(text = '') {
+      const s = String(text).toLowerCase();
+      if (/(家教|辅导|陪练|课程|授课|教学|培训|咨询|翻译|代写|跑腿|代取|服务费|每小时|课时)/.test(s)) return 'skill';
+      if (/(摄影|证件照|毕业照|写真|修图|设计|美甲|理发|洗鞋|维修|打印|相框|装裱|到店)/.test(s)) return 'creative';
+      if (/(零食|盲盒|二手|闲置|电商|微商|进货|代购|礼包|网店|商品|卖货)/.test(s)) return 'retail';
+      if (/(奶茶|柠檬茶|饮料|咖啡|甜品|蛋糕|小吃|餐|摆摊|每杯|原料)/.test(s)) return 'beverage';
+      return 'other';
+    }
+    
+    // Core parameters (most frequently tuned)
+    const coreSpecs = [
+      ['price', '售价（元 / 杯）', 8],
+      ['sales', '预计日销量（杯）', 30],
+      ['raw', '原料（元 / 杯，损耗前）', 3],
+      ['days', '月营业天数', 20]
+    ];
+
+    // Advanced / fine-tuning parameters (folded in accordion)
+    const advancedSpecs = [
+      ['rent', '月摊位费（元）', 500],
+      ['pack', '包装（元 / 杯）', 0.5],
+      ['loss', '原料损耗率（%）', 10],
+      ['fee', '平台抽成率（%）', 0],
+      ['other', '其他月固定现金支出（元）', 200],
+      ['investment', '初始设备投入（元）', 2000],
+      ['life', '设备折旧年限（月）', 24],
+      ['hours', '每日投入总工时', 3],
+      ['wage', '兼职参考时薪（元）', 20]
+    ];
+
+    const specs = [...coreSpecs, ...advancedSpecs];
+    const $ = id => document.getElementById(id);
+    let factor = 1, customFactor = null, confirmed = Object.fromEntries(specs.map(([k, l, v]) => [k, v]));
+
+    // Render Field Inputs cleanly into Core and Advanced Accordion
+    $('fields-core').innerHTML = coreSpecs.map(([k, l, v]) => 
+      `<label for="${k}" data-field="${k}"><span class="field-label">${l}</span><input id="${k}" type="number" min="0" step="any" value="${v}"><span class="source" id="source-${k}">演示假设 · 待核对</span></label>`
+    ).join('');
+
+    $('fields-advanced').innerHTML = advancedSpecs.map(([k, l, v]) => 
+      `<label for="${k}" data-field="${k}"><span class="field-label">${l}</span><input id="${k}" type="number" min="0" step="any" value="${v}"><span class="source" id="source-${k}">演示假设 · 待核对</span></label>`
+    ).join('');
+
+    function setScene(key, meta = {}) {
+      const normalized = String(key || '').toLowerCase();
+      sceneProfile = SCENE_PROFILES[normalized] || SCENE_PROFILES.other;
+      currentUnit = validUnit(meta.unit) || sceneProfile.unit;
+      renderSceneUI();
+    }
+
+    function renderSceneUI() {
+      const profile = sceneProfile;
+      const labels = profile.labels || {};
+      document.querySelectorAll('#fields label[data-field]').forEach(label => {
+        const key = label.dataset.field;
+        const labelEl = label.querySelector('.field-label');
+        if (labelEl && labels[key]) {
+          labelEl.textContent = ['price','sales','raw','pack'].includes(key)
+            ? labels[key].split(profile.unit).join(currentUnit) : labels[key];
+          if (profile.key === 'skill' && currentUnit !== '小时') {
+            const serviceLabels = {price:`服务单价（元 / ${currentUnit}）`,sales:`预计日服务量（${currentUnit}）`,raw:`每${currentUnit}直接交付成本（元）`,pack:`每${currentUnit}交付耗材（元）`};
+            if (serviceLabels[key]) labelEl.textContent = serviceLabels[key];
+          }
+        }
+        const hidden = profile.hide.includes(key) && !Number($(key)?.value);
+        label.hidden = hidden;
+        label.style.display = hidden ? 'none' : '';
+        const input = label.querySelector('input');
+        if (input) input.required = false;
+      });
+      const countVisible = advancedSpecs.filter(([k]) => !profile.hide.includes(k)).length;
+      if ($('advanced-count-tag')) $('advanced-count-tag').textContent = `${countVisible} 项按场景优化`;
+      if ($('scene-focus-badge')) $('scene-focus-badge').textContent = profile.label;
+      const byDelivery = profile.key === 'skill' && currentUnit !== '小时';
+      if ($('scene-focus-summary')) $('scene-focus-summary').textContent = byDelivery ? '重点核对每次交付的报价、交通与直接成本、准备到交付总工时和获客费用。' : profile.summary;
+      const tags = byDelivery ? ['按次报价', '直接交付成本', '准备 / 交通工时', '获客费用'] : profile.tags;
+      if ($('scene-focus-tags')) $('scene-focus-tags').innerHTML = tags.map(t => `<span class="scene-focus-tag">${t}</span>`).join('');
+      const service = profile.kind === 'service';
+      const chipExamples = [
+        {label: service ? '📋 补充不同服务报价' : '📋 补充不同商品报价', value: `每天6${currentUnit}收费35元，2${currentUnit}收费60元。`},
+        {label: service ? '🧾 补充交付成本' : '📦 补充包装履约成本', value: service ? '每次交付耗材成本3元，包装成本2元。' : '包装成本每份0.5元。'},
+        {label:'⏱ 补充完整工作时间', value:'每天包含准备、沟通和交付，总工时5小时。'}
+      ];
+      document.querySelectorAll('.chip-btn').forEach((btn, i) => { if (chipExamples[i]) { btn.textContent = chipExamples[i].label; btn.dataset.preset = chipExamples[i].value; } });
+      if ($('ai-reply-input')) $('ai-reply-input').placeholder = service ? '例如：每天包含准备和交付共5小时；直接耗材3元，包装2元。请按真实情况补充。' : '例如：包装成本每份0.5元；每天备货、售卖和收尾共5小时。请按真实情况补充。';
+      const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
+      if (heading && !pendingReview) heading.textContent = profile.title + ' · 开张前测算';
+      if ($('cost-viz-title')) $('cost-viz-title').textContent = profile.kind === 'service' ? `💰 每${currentUnit}服务收入与交付成本` : `💰 每${currentUnit}价格与成本结构`;
+      if ($('scene-kind')) $('scene-kind').value = profile.key;
+      if ($('business-unit')) $('business-unit').value = currentUnit;
+      if ($('custom-factor-unit')) $('custom-factor-unit').textContent = currentUnit;
+      document.querySelectorAll('.unit-text').forEach(el => el.textContent = currentUnit);
+      renderSceneChartLabels();
+    }
+
+    function renderSceneChartLabels() {
+      const profile = sceneProfile;
+      const legRaw = $('leg-raw'), legPack = $('leg-pack'), legFee = $('leg-fee'), legMargin = $('leg-margin');
+      if (legRaw) legRaw.innerHTML = `<span class="legend-dot seg-raw"></span> ${profile.kind === 'service' ? '直接耗材 / 交通' : profile.key === 'retail' ? '进货成本（含损耗）' : '直接原料（含损耗）'}`;
+      if (legPack) legPack.innerHTML = `<span class="legend-dot seg-pack"></span> ${profile.kind === 'service' ? '交付耗材' : '包装 / 履约耗材'}`;
+      if (legFee) legFee.innerHTML = `<span class="legend-dot seg-fee"></span> 平台 / 支付费用`;
+      if (legMargin) legMargin.innerHTML = `<span class="legend-dot seg-margin"></span> ${profile.kind === 'service' ? '劳动回报空间' : '单位边际毛利'}`;
+    }
+
+    // Deterministic Financial Model
+    function calc(x, f = 1) {
+      const q = x.sales * f * x.days;
+      const v = x.raw / (1 - x.loss / 100) + x.pack + x.price * x.fee / 100;
+      const margin = x.price - v;
+      const fixed = x.rent + x.other;
+      const revenue = q * x.price;
+      const cash = q * margin - fixed;
+      const dep = x.investment / x.life;
+      const profit = cash - dep;
+      const breakeven = margin > 0 ? (fixed + dep) / margin / x.days : null;
+      const hours = x.hours * x.days;
+      return {
+        q, v, margin, fixed, revenue, cash, dep, profit, breakeven,
+        payback: cash > 0 ? x.investment / cash : null,
+        hourly: hours > 0 ? profit / hours : 0,
+        economic: profit - hours * x.wage
+      };
+    }
+
+    const money = n => Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const displayBreakeven = value => currentUnit === '小时' ? Math.ceil(value * 100) / 100 : Math.ceil(value);
+
+    // Studio Tab Switching Mechanism
+    document.querySelectorAll('.studio-tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        const tabId = btn.dataset.tab;
+        document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.studio-tab-pane').forEach(p => p.classList.toggle('active', p.id === tabId));
+      };
+    });
+
+    // Update Visual Gauges across ALL Scenarios
+    function updateVisualGauges(x, r) {
+      const gaugeBadge = $('gauge-badge');
+      const gaugeLoss = $('gauge-loss');
+      const gaugeProfit = $('gauge-profit');
+      const gaugePin = $('gauge-pin');
+      const gaugeBeLabel = $('gauge-be-label');
+      const gaugeTargetLabel = $('gauge-target-label');
+
+      document.querySelectorAll('.unit-text').forEach(el => el.textContent = currentUnit);
+
+      if (gaugeBadge && gaugeLoss && gaugeProfit && gaugePin) {
+        const targetSales = x.sales * factor;
+        if (r.breakeven === null || r.margin <= 0) {
+          gaugeBadge.textContent = '无法保本 (边际为负)';
+          gaugeBadge.className = 'viz-badge badge-danger';
+          gaugeLoss.style.width = '100%';
+          gaugeProfit.style.width = '0%';
+          gaugePin.style.left = '100%';
+          gaugeBeLabel.textContent = '保本点: 边际成本超出售价';
+          gaugeTargetLabel.textContent = `预计日交付量: ${money(targetSales)} ${currentUnit}`;
+        } else {
+          const be = displayBreakeven(r.breakeven);
+          const maxVal = Math.max(targetSales * 1.35, be * 1.35, 10);
+          const bePct = Math.min(100, Math.max(4, (be / maxVal) * 100));
+          const targetPct = Math.min(100, Math.max(4, (targetSales / maxVal) * 100));
+          
+          gaugePin.style.left = bePct.toFixed(1) + '%';
+          gaugeBeLabel.textContent = `保本线: ${be} ${currentUnit}`;
+          gaugeTargetLabel.textContent = `${sceneProfile.kind === 'service' ? '预计日服务量' : '预计日销量'}: ${money(targetSales)} ${currentUnit}`;
+
+          if (targetSales >= be) {
+            const safetyPct = targetSales > 0 ? ((targetSales - be) / targetSales * 100) : 0;
+            gaugeLoss.style.width = bePct.toFixed(1) + '%';
+            gaugeProfit.style.width = Math.max(0, targetPct - bePct).toFixed(1) + '%';
+            gaugeBadge.textContent = `安全边际率: ${safetyPct.toFixed(1)}% (盈利安全区)`;
+            gaugeBadge.className = 'viz-badge badge-success';
+          } else {
+            const gap = be - targetSales;
+            gaugeLoss.style.width = targetPct.toFixed(1) + '%';
+            gaugeProfit.style.width = '0%';
+            gaugeBadge.textContent = `警报：还差 ${gap.toFixed(1)} ${currentUnit}/天保本`;
+            gaugeBadge.className = 'viz-badge badge-warning';
+          }
+        }
+      }
+
+      // Unit Cost Anatomy Bar
+      const costMarginPct = $('cost-margin-pct');
+      const segRaw = $('seg-raw');
+      const segPack = $('seg-pack');
+      const segFee = $('seg-fee');
+      const segMargin = $('seg-margin');
+      const legRaw = $('leg-raw');
+      const legPack = $('leg-pack');
+
+      if (costMarginPct && segRaw && segPack && segMargin) {
+        const p = x.price;
+        const isPureService = sceneProfile.kind === 'service' && p > 0 && x.raw === 0 && x.pack === 0;
+
+        if (isPureService) {
+          if (legRaw) legRaw.style.display = 'none';
+          if (legPack) legPack.style.display = 'none';
+          segRaw.style.width = '0%';
+          segPack.style.width = '0%';
+          // Clear labels from a previous product scenario (for example,
+          // switching from lemon tea to tutoring). Zero-width segments can
+          // still retain their old text and make the visual look stale.
+          segRaw.textContent = '';
+          segPack.textContent = '';
+          segRaw.title = '';
+          segPack.title = '';
+          
+          const feePct = Math.max(0, Math.min(100, x.fee || 0));
+          const marginPct = Math.max(0, 100 - feePct);
+
+          if (segFee) {
+            segFee.style.width = feePct.toFixed(1) + '%';
+            segFee.textContent = feePct > 8 ? `平台 ${feePct.toFixed(0)}%` : '';
+            segFee.title = feePct > 0 ? `平台抽成: ${feePct.toFixed(1)}%` : '';
+          }
+          segMargin.style.width = marginPct.toFixed(1) + '%';
+          segMargin.textContent = `纯劳动时间回报 ${marginPct.toFixed(0)}%`;
+          costMarginPct.textContent = `服务毛利率: ${marginPct.toFixed(1)}%`;
+          costMarginPct.className = 'viz-badge badge-success';
+        } else if (p > 0) {
+          if (legRaw) legRaw.style.display = '';
+          if (legPack) legPack.style.display = '';
+
+          const rawWithLoss = x.raw / (1 - (x.loss || 0) / 100);
+          const packCost = x.pack;
+          const feeCost = p * (x.fee || 0) / 100;
+          const margin = p - r.v;
+
+          const rawPct = Math.max(0, Math.min(100, (rawWithLoss / p) * 100));
+          const packPct = Math.max(0, Math.min(100, (packCost / p) * 100));
+          const feePct = Math.max(0, Math.min(100, (feeCost / p) * 100));
+          const marginPct = (margin / p) * 100;
+
+          segRaw.style.width = rawPct.toFixed(1) + '%';
+          const rawName = sceneProfile.kind === 'service' ? '直接耗材' : sceneProfile.key === 'retail' ? '进货' : '原料';
+          const packName = sceneProfile.kind === 'service' ? '交付耗材' : '包装';
+          segRaw.textContent = rawPct > 12 ? `${rawName} ${rawPct.toFixed(0)}%` : '';
+          segRaw.title = `${rawName}(含损耗): ¥${money(rawWithLoss)} (${rawPct.toFixed(1)}%)`;
+
+          segPack.style.width = packPct.toFixed(1) + '%';
+          segPack.textContent = packPct > 9 ? `${packName} ${packPct.toFixed(0)}%` : '';
+          segPack.title = `${packName}: ¥${money(packCost)} (${packPct.toFixed(1)}%)`;
+
+          if (segFee) {
+            segFee.style.width = feePct.toFixed(1) + '%';
+            segFee.textContent = feePct > 8 ? `平台 ${feePct.toFixed(0)}%` : '';
+            segFee.title = `平台 / 支付费用: ¥${money(feeCost)} (${feePct.toFixed(1)}%)`;
+          }
+
+          segMargin.style.width = Math.max(0, Math.min(100, marginPct)).toFixed(1) + '%';
+          const marginName = sceneProfile.kind === 'service' ? '劳动回报' : '毛利';
+          segMargin.textContent = marginPct > 14 ? `${marginName} ${marginPct.toFixed(0)}%` : '';
+          segMargin.title = `${sceneProfile.kind === 'service' ? '单位服务回报' : '单位边际毛利'}: ¥${money(margin)} (${marginPct.toFixed(1)}%)`;
+
+          costMarginPct.textContent = sceneProfile.kind === 'service' ? `服务回报率: ${marginPct.toFixed(1)}%` : `毛利率: ${marginPct.toFixed(1)}%`;
+          costMarginPct.className = marginPct >= 40 ? 'viz-badge badge-success' : marginPct > 0 ? 'viz-badge badge-warning' : 'viz-badge badge-danger';
+        } else {
+          [segRaw, segPack, segFee, segMargin].filter(Boolean).forEach(el => { el.style.width = '0%'; el.textContent = ''; el.title = ''; });
+          costMarginPct.textContent = '售价为 0，暂无收入占比';
+          costMarginPct.className = 'viz-badge badge-warning';
+        }
+      }
+    }
+
+    // AI Deep Data Analysis Engine
+    let playbookExpanded = false;
+    function renderDynamicPlaybook(tips) {
+      const container = $('ai-playbook-list');
+      if (!container) return;
+      function redraw() {
+        const visible = playbookExpanded ? tips : tips.slice(0, 3);
+        let html = visible.map((t, idx) => `
+          <div class="playbook-item">
+            <span class="playbook-badge">建议 ${idx + 1}</span>
+            <span>${t}</span>
+          </div>`).join('');
+        if (tips.length > 3) {
+          html += `<button type="button" class="ai-toggle-btn" id="btn-toggle-playbook">${playbookExpanded ? '收起部分锦囊 ▴' : '展开查看全部 ' + tips.length + ' 条落地锦囊 ▾'}</button>`;
+        }
+        container.innerHTML = html;
+        const btn = $('btn-toggle-playbook');
+        if (btn) btn.onclick = () => { playbookExpanded = !playbookExpanded; redraw(); };
+      }
+      redraw();
+    }
+
+    function runAIDataDeepAnalysis(x, r) {
+      const marginRatio = x.price > 0 ? (r.margin / x.price) : 0;
+      const targetSales = x.sales * factor;
+      const be = (r.breakeven === null || r.breakeven === undefined) ? Infinity : displayBreakeven(r.breakeven);
+      const safetyMarginPct = targetSales > be ? ((targetSales - be) / targetSales * 100) : 0;
+      const hourlyVsWage = x.wage > 0 ? (r.hourly / x.wage) : 1;
+
+      // Profitability Rating
+      let marginTxt = "稳健微利", marginStars = "★★★★☆";
+      if (r.margin <= 0) { marginTxt = "亏损倒挂"; marginStars = "★☆☆☆☆"; }
+      else if (marginRatio >= 0.6) { marginTxt = "极高毛利"; marginStars = "★★★★★"; }
+      else if (marginRatio >= 0.35) { marginTxt = "良性毛利"; marginStars = "★★★★☆"; }
+      else { marginTxt = "薄利承压"; marginStars = "★★☆☆☆"; }
+      $('dim-margin-text').textContent = marginTxt;
+      $('dim-margin-stars').textContent = marginStars;
+
+      // Risk Resilience Rating
+      let riskTxt = "中等安全垫", riskStars = "★★★☆☆";
+      if (targetSales < be) { riskTxt = "未达保本线"; riskStars = "★☆☆☆☆"; }
+      else if (safetyMarginPct >= 50) { riskTxt = "充裕安全垫"; riskStars = "★★★★★"; }
+      else if (safetyMarginPct >= 25) { riskTxt = "韧性良好"; riskStars = "★★★★☆"; }
+      else { riskTxt = "脆弱警戒"; riskStars = "★★☆☆☆"; }
+      $('dim-risk-text').textContent = riskTxt;
+      $('dim-risk-stars').textContent = riskStars;
+
+      // Time Efficiency Rating
+      let timeTxt = "与兼职持平", timeStars = "★★★☆☆";
+      if (r.hourly <= 0) { timeTxt = "负时间回报"; timeStars = "★☆☆☆☆"; }
+      else if (hourlyVsWage >= 1.5) { timeTxt = "显著超兼职"; timeStars = "★★★★★"; }
+      else if (hourlyVsWage >= 1.0) { timeTxt = "略优于兼职"; timeStars = "★★★★☆"; }
+      else { timeTxt = "低于兼职"; timeStars = "★★☆☆☆"; }
+      $('dim-time-text').textContent = timeTxt;
+      $('dim-time-stars').textContent = timeStars;
+
+      // Sensitivity Leverage
+      const cashBase = r.cash;
+      const cashPriceUp = calc({ ...x, price: x.price * 1.1 }, factor).cash;
+      const cashSalesUp = calc(x, factor * 1.1).cash;
+      const diffPrice = cashPriceUp - cashBase;
+      const diffSales = cashSalesUp - cashBase;
+
+      if (diffPrice > diffSales * 1.15) {
+        $('ai-leverage-text').innerHTML = `当前模型中最敏感的杠杆是<strong>【${sceneProfile.kind === 'service' ? '服务单价' : '单位定价'}】</strong>。提高 10% 可增加月收益 <strong>¥${money(diffPrice)}</strong>，效果显著优于增加 10% ${sceneProfile.kind === 'service' ? '服务量' : '销量'}（仅增 ¥${money(diffSales)}）。建议通过明确交付边界、套餐或品质做溢价。`;
+      } else if (diffSales > diffPrice * 1.1) {
+        $('ai-leverage-text').innerHTML = `当前${sceneProfile.kind === 'service' ? '服务回报' : '单位毛利'}已足够，最敏感的杠杆是<strong>【${sceneProfile.kind === 'service' ? '可交付服务量' : '客流与日销量'}】</strong>。增加 10% ${sceneProfile.kind === 'service' ? '服务量' : '销量'}可带来月净增 <strong>¥${money(diffSales)}</strong>。建议把核心精力放在稳定客源、复购和交付效率上。`;
+      } else {
+        $('ai-leverage-text').innerHTML = `当前${sceneProfile.kind === 'service' ? '服务单价与可交付量' : '定价与销量'}处于均衡弹性区间。单价提高 10% 增益 ¥${money(diffPrice)}，${sceneProfile.kind === 'service' ? '服务量' : '销量'}增 10% 增益 ¥${money(diffSales)}。建议兼顾${sceneProfile.kind === 'service' ? '客源转化与交付效率' : '客流转化与单位定价'}。`;
+      }
+
+      // Actionable Playbook
+      const tips = [];
+      if (r.margin <= 0) {
+        tips.push(`紧急定价预警：${sceneProfile.kind === 'service' ? '单位服务回报' : '单位边际毛利'}为负，至少需要提高单价 ¥${money(r.v - x.price + 1)} 才能转亏为盈。`);
+        tips.push(sceneProfile.kind === 'service' ? '暂停低价接单：先拆出沟通、准备、交付和售后时间，避免低价吞噬工时。' : '停止盲目备货：在成本未重估前，切忌批量采购，避免资金沉淀。');
+        tips.push(sceneProfile.key === 'retail' ? '重新询价并缩短库存周期，核对进货、履约与滞销损耗。' : sceneProfile.kind === 'service' ? '优先压缩无效工时和平台抽成，再决定是否扩大接单量。' : '重新询价压降损耗，结合保本线确定可接受的直接成本。');
+        tips.push(sceneProfile.kind === 'service' ? '简化服务套餐：先保留交付边界清晰、返工少的标准服务。' : '简化产品线：先保留毛利健康、损耗可控的单品。');
+      } else if (targetSales < be) {
+        const gap = Math.ceil(be - targetSales);
+        tips.push('保本缺口警示：距离保本线还差 ' + gap + ' ' + currentUnit + '/天，月固定开支（¥' + money(r.fixed) + '）是首要压力。');
+        tips.push('设备轻资产化：初始设备款 ¥' + money(x.investment) + ' 建议以租代买或买二手，降低折旧负担。');
+        tips.push(`试卖止损红线：第 1 周日均若无法跨越 ${Math.ceil(be * 0.8)} ${currentUnit}，调整客源、报价或暂停投入。`);
+        tips.push(sceneProfile.kind === 'service' ? '前置低成本验证：先用 3 个真实试单验证客源、交付时长和复购意愿。' : '前置低成本验证：先做小批量预售或试卖，确认真实需求再扩大投入。');
+      } else if (r.economic < 0) {
+        tips.push('时间性价比优化：当前折合时薪 ¥' + money(r.hourly) + '/小时，低于兼职时薪（¥' + money(x.wage) + '/小时），劳动回报偏低。');
+        tips.push(sceneProfile.kind === 'service' ? '缩短交付链路：把沟通、准备和交付模板化，减少无效等待。' : '缩短经营耗时：优化备货、出摊或履约动线，提高单位时间产出。');
+        tips.push(sceneProfile.key === 'retail' ? '开发组合包或提高客单价，优先改善每单贡献。' : sceneProfile.kind === 'service' ? '设计标准套餐与加价项，提高每小时创收。' : '开发组合套餐或加价项，提高每次交付产出。');
+        tips.push('明确经营定位：若时薪长期无法突破兼职水平，应把项目当作低成本练手机会，不宜重金下注。');
+      } else {
+        tips.push('商业模型基本成立：安全边际率达 ' + safetyMarginPct.toFixed(1) + '%，月净现金结余 ¥' + money(r.cash) + '，具备试卖基础。');
+        tips.push(`实地小步快跑：连续记录 3 天真实${sceneProfile.kind === 'service' ? '接单、交付工时与客户反馈' : '销量、损耗与客流'}。`);
+        tips.push(sceneProfile.kind === 'service' ? '锁住交付质量：记录返工、取消和超时，确保实际时薪与账面一致。' : sceneProfile.key === 'retail' ? '锁住库存周转：记录滞销、退换货和快递成本，确保实际毛利与账面一致。' : '锁住原料损耗：记录变质、破损和实际耗材，确保实际毛利与账面一致。');
+        tips.push('沉淀第一批种子客户：试卖期间记录来源、复购意愿和愿意支付的价格。');
+      }
+      renderDynamicPlaybook(tips);
+    }
+
+    // Render Expandable & Interactive AI Questions
+    function bindQuestionPillClick(container) {
+      if (!container) return;
+      container.querySelectorAll('.ai-question-pill').forEach(pill => {
+        pill.style.cursor = 'pointer';
+        pill.title = '点击针对此问题进行回答';
+        pill.onclick = () => {
+          container.querySelectorAll('.ai-question-pill').forEach(p => p.style.borderColor = '');
+          pill.style.borderColor = 'var(--primary)';
+          const text = pill.textContent.replace(/💡|💬 回复/g, '').trim();
+          if ($('reply-target-tag')) $('reply-target-tag').textContent = '针对：' + text.slice(0, 16) + '...';
+          const input = $('ai-reply-input');
+          if (input) {
+            input.placeholder = `针对“${text.slice(0, 18)}...”输入你的回答或真实参数...`;
+            input.focus();
+          }
+        };
+      });
+    }
+
+    function renderExpandableQuestions(qs) {
+      const container = $('ai-questions-list');
+      if (!container) return;
+      let expanded = false;
+      function redraw() {
+        const visibleQs = expanded ? qs : qs.slice(0, 3);
+        let html = visibleQs.map(q => `
+          <div class="ai-question-pill" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>💡 ${q}</span>
+            <span style="font-size:11px; font-weight:700; color:var(--primary); margin-left:8px; white-space:nowrap; text-decoration:underline;">💬 回复</span>
+          </div>`).join('');
+        if (qs.length > 3) {
+          html += `<button type="button" class="ai-toggle-btn" id="btn-toggle-qs">${expanded ? '收起部分追问 ▴' : '展开查看全部 ' + qs.length + ' 项成本追问 ▾'}</button>`;
+        }
+        container.innerHTML = html;
+        bindQuestionPillClick(container);
+        const btn = $('btn-toggle-qs');
+        if (btn) btn.onclick = () => { expanded = !expanded; redraw(); };
+      }
+      redraw();
+    }
+
+    // Key Parameter Impact Ranking inside Tab 2
+    function renderImpact() {
+      const listEl = $("impact-list");
+      if (!listEl) return;
+      const base = calc(confirmed, 1).cash;
+      const profile = sceneProfile;
+      const unitLabel = profile.unit;
+      const tests = [
+        [profile.kind === 'service' ? '服务单价 (+10%)' : '单位售价 (+10%)', 'price', v => v * 1.1],
+        [profile.kind === 'service' ? '直接耗材成本 (+10%)' : profile.key === 'retail' ? '进货成本 (+10%)' : '原料成本 (+10%)', 'raw', v => v * 1.1],
+        [profile.kind === 'service' ? '日服务量 (+10%)' : '日销量 (+10%)', 'sales', v => v * 1.1],
+        ['月固定支出 (+10%)', 'rent', v => v * 1.1]
+      ];
+      const rows = tests.map(([label, key, fn]) => {
+        const x = { ...confirmed };
+        x[key] = fn(x[key]);
+        const d = calc(x, 1).cash - base;
+        return { label, d };
+      }).sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+
+      listEl.innerHTML = rows.map((r, i) => `
+        <div class="breakdown">
+          <span>${i + 1}. ${r.label}</span>
+          <strong class="${r.d < 0 ? 'negative' : 'positive'}">${r.d >= 0 ? '+' : ''}${money(r.d)} 元/月</strong>
+        </div>`).join('');
+
+      const tipEl = $("impact-leverage-tip");
+      if (tipEl && rows.length) {
+        tipEl.innerHTML = '👑 <strong>第一核实优先级：</strong>【' + rows[0].label.replace(' (+10%)', '') + '】对月现金结余影响最大（' + (rows[0].d >= 0 ? '+' : '') + money(rows[0].d) + ' 元），优先核实；【' + rows[rows.length - 1].label.replace(' (+10%)', '') + '】影响最小，可后置。';
+      }
+    }
+
+    // Action Checklist Generator inside Tab 3
+    function renderActions() {
+      const listEl = $("action-list");
+      if (!listEl) return;
+      const r = calc(confirmed, factor);
+      const actions = [];
+      if (r.margin <= 0) actions.push(sceneProfile.kind === 'service' ? '重新核算服务报价与每小时直接成本，单位服务回报必须先扭负为正。' : '重新核算售价与单位采购 / 包装成本，单位边际毛利必须先扭负为正。');
+      if (r.breakeven && confirmed.sales < r.breakeven) actions.push(sceneProfile.kind === 'service' ? '当前可交付服务时长低于保本线，先做小范围试单，暂缓大额设备投入。' : `当前预计日销低于保本线，先做微型试卖，暂缓一次性备货；还差 ${Math.ceil(r.breakeven - confirmed.sales)} ${currentUnit}/天。`);
+      if (sceneProfile.key === 'beverage') actions.push('向至少 2 家原料与包材供应商询价，拆开记录鲜品、杯具、吸管和损耗。');
+      else if (sceneProfile.key === 'retail') actions.push('记录进货价、快递包装和滞销库存，至少比较 2 个进货渠道的周转条件。');
+      else if (sceneProfile.key === 'skill') actions.push('记录备课、通勤、沟通和授课总时长，避免只用授课小时计算时薪。');
+      else if (sceneProfile.key === 'creative') actions.push('把沟通、准备、处理和交付拆成工时，单独核对设备维护与返工。');
+      else actions.push('把每单直接成本、交付工时和一次性投入分别记录，避免把固定投入混进单价。');
+      actions.push(sceneProfile.kind === 'service' ? '核实客源渠道、平台佣金、场地与交通费用。' : '核实场地许可、校园准入、平台佣金和支付费率。');
+      actions.push(`连续记录至少 3 天真实${sceneProfile.kind === 'service' ? '服务单量、收入、成本和工时' : '销量、收入、成本和工时'}，替换本页演示假设。`);
+      if (r.economic < 0) actions.push('设定止损红线：若连续一周实际时薪低于兼职参考水平，应调整报价、流程或停止投入。');
+
+      listEl.innerHTML = actions.map(a => `<label class="check"><input type="checkbox"><span>${a}</span></label>`).join('');
+    }
+
+    // Main Render Routine
+    function render() {
+      ['copy-summary','save-plan','export-json','export','trigger-ai-analysis','add-trial'].forEach(id => { if ($(id)) $(id).disabled = pendingReview; });
+      if (pendingReview) {
+        // Prevent figures from the previous scenario being mistaken for the
+        // newly recognized one. They are restored after confirmation.
+        document.querySelectorAll('.viz-section, .studio-tab-pane').forEach(el => {
+          el.dataset.pendingHidden = '1';
+          el.style.display = 'none';
+        });
+        $('decision').innerHTML = '<strong>已识别新场景，请确认参数</strong><p>AI 已更新表单字段；请核对下方参数并点击“确认参数，更新测算”，避免沿用上一场景数据。</p>';
+        if ($('scenario-label')) $('scenario-label').textContent = '新场景参数待确认 · 暂不显示上一场景测算';
+        if ($('ai-advice-box')) $('ai-advice-box').innerHTML = '<div class="ai-insight-item info"><div class="ai-insight-title">⏳ 等待确认</div><div class="ai-insight-desc">当前诊断只针对已确认参数生成。请先确认识别结果，再查看收支和策略建议。</div></div>';
+        $('metrics').innerHTML = ['月经营现金结余', '月度扣折旧后盈余', '日均保本量', '简化回收期'].map(l => 
+          `<div class="metric"><span>${l}</span><strong>待确认</strong><small>点击下方“确认参数，更新测算”</small></div>`
+        ).join('');
+        $('breakdown').innerHTML = '';
+        return;
+      }
+
+      document.querySelectorAll('[data-pending-hidden="1"]').forEach(el => {
+        el.style.display = '';
+        delete el.dataset.pendingHidden;
+      });
+
+      const x = confirmed, r = calc(x, factor);
+      let scenarioName = '基准情景';
+      if (Math.abs(factor - 0.8) < 0.001) scenarioName = '销量下降 20%';
+      else if (Math.abs(factor - 1.2) < 0.001) scenarioName = '销量增加 20%';
+      else if (Math.abs(factor - 1) >= 0.001) {
+        const p = Math.round((factor - 1) * 100);
+        scenarioName = `自定义情景 (${p >= 0 ? '+' : ''}${p}%)`;
+      }
+      $('scenario-label').textContent = `${scenarioName} · ${sceneProfile.kind === 'service' ? '预计日服务量' : '预计日销量'} ${money(x.sales * factor)} ${currentUnit} · 每月${sceneProfile.kind === 'service' ? '服务' : '经营'} ${x.days} 天`;
+
+      let title, why;
+      const unitNoun = sceneProfile.kind === 'service' ? '一次服务' : `一个${currentUnit}`;
+      if (r.margin <= 0) {
+        title = '先调整定价与单位成本';
+        why = `${unitNoun}都无法覆盖单位变动成本，增加${sceneProfile.kind === 'service' ? '接单量' : '销量'}不能解决亏损，必须重新核定价格。`;
+      } else if (r.profit <= 0) {
+        title = '当前假设下，尚未达到保本线';
+        why = '预计销量低于日均保本销量，优先核实客流、降低固定开支或提高单价后再决定是否试卖。';
+      } else if (r.economic < 0) {
+        title = '账面有盈余，但时间回报偏低';
+        why = `扣折旧后每小时盈余仅 ${money(r.hourly)} 元，低于兼职参考时薪 ${money(x.wage)} 元。建议先轻量验证。`;
+      } else {
+        title = '当前假设下有盈余，建议先试卖';
+        why = '财务模型在当前假设下成立；但预计销量仍需用真实出摊数据进行验证。';
+      }
+
+      $('decision').innerHTML = `<strong>${title}</strong><p>${why}</p>`;
+
+      const unitLabel = currentUnit;
+      const cards = [
+        ['月经营现金结余', `¥ ${money(r.cash)}`, '未扣设备折旧、个人劳动报酬及税费'],
+        ['月度扣折旧后盈余', `¥ ${money(r.profit)}`, '扣减固定设备月均折旧后的经营盈余'],
+        ['日均会计保本量', r.breakeven === null ? '无法保本' : `${displayBreakeven(r.breakeven)} ${unitLabel}`, '覆盖全部固定开支与设备折旧的底线'],
+        ['简化现金回收期', r.payback === null ? '无法回本' : `${money(r.payback)} 个月`, '设备投入 ÷ 月经营净现金结余']
+      ];
+      $('metrics').innerHTML = cards.map(([l, v, h]) => 
+        `<div class="metric"><span>${l}</span><strong>${v}</strong><small>${h}</small></div>`
+      ).join('');
+
+      const variableLabel = sceneProfile.kind === 'service' ? '服务交付变动成本（耗材 + 平台）' : sceneProfile.key === 'retail' ? '商品变动成本（进货 + 履约 + 平台）' : '商品变动成本（原料 + 包装 + 平台）';
+      $('breakdown').innerHTML = [
+        ['月销售收入预估', r.revenue],
+        [variableLabel, r.q * r.v],
+        ['月固定现金支出（场地 + 其他）', r.fixed],
+        ['月设备折旧（直线摊销）', r.dep],
+        [(sceneProfile.kind === 'service' ? '单位服务回报' : '单位边际贡献') + '（元 / ' + unitLabel + '）', r.margin],
+        ['折合实际时薪（元 / 小时）', r.hourly],
+        ['扣除兼职机会成本后的月盈余', r.economic]
+      ].map(([l, v]) => 
+        `<div class="breakdown"><span>${l}</span><strong class="${v < 0 ? 'negative' : (v > 0 ? 'positive' : '')}">¥ ${money(v)}</strong></div>`
+      ).join('');
+
+      const rawTerm = sceneProfile.kind === 'service' ? '直接耗材' : sceneProfile.key === 'retail' ? '进货成本' : '原料';
+      $('formula').innerHTML = 
+        `<p>• 单位变动成本 = ${rawTerm} ÷ (1 − 损耗率) + 交付耗材 + 售价 × 平台费用率 = ${money(r.v)} 元</p>` +
+        `<p>• 月经营现金结余 = 日销量 × 营业天数 × 单位边际贡献 − 月固定现金支出 = ${money(r.cash)} 元</p>` +
+        `<p>• 月折旧 = 设备投入 ÷ 折旧月数 = ${money(r.dep)} 元；扣折旧后盈余 = 现金结余 − 折旧 = ${money(r.profit)} 元</p>` +
+        `<p>• 日均会计保本量 = (月固定支出 + 月折旧) ÷ 单位边际贡献 ÷ 营业天数 = ${r.breakeven !== null ? money(r.breakeven) : '无解'} ${unitLabel}</p>` +
+        `<p>• 个人时间回报 = 扣折旧后盈余 ÷ (每日工时 × 月天数) = ${money(r.hourly)} 元 / 小时</p>`;
+
+      const displayFactors = [0.8, 1, 1.2];
+      if (customFactor !== null && !displayFactors.some(f => Math.abs(f - customFactor) < 0.001)) {
+        displayFactors.push(customFactor);
+        displayFactors.sort((a, b) => a - b);
+      }
+
+      $('scenario-table').innerHTML = displayFactors.map(f => {
+        const t = calc(x, f);
+        const isActive = Math.abs(f - factor) < 0.001;
+        let label = '基准';
+        if (Math.abs(f - 0.8) < 0.001) label = '下降 20%';
+        else if (Math.abs(f - 1.2) < 0.001) label = '增加 20%';
+        else if (Math.abs(f - 1) >= 0.001) {
+          const p = Math.round((f - 1) * 100);
+          label = `自定义 (${p >= 0 ? '+' : ''}${p}%)`;
+        }
+
+        return `<tr class="clickable-scenario-row ${isActive ? 'active-scenario-row' : ''}" data-table-factor="${f}" title="点击直接切换至该情景测算">
+          <td><strong>${label}</strong> ${isActive ? '<span class="viz-badge badge-success" style="font-size: 10px; margin-left: 6px;">✓ 当前选中</span>' : ''}</td>
+          <td>${money(x.sales * f)} ${unitLabel}</td>
+          <td class="${t.cash < 0 ? 'negative' : 'positive'}">¥ ${money(t.cash)}</td>
+          <td class="${t.profit < 0 ? 'negative' : 'positive'}">¥ ${money(t.profit)}</td>
+        </tr>`;
+      }).join('');
+
+      document.querySelectorAll('#scenario-table [data-table-factor]').forEach(row => {
+        row.onclick = () => {
+          selectScenarioFactor(+row.dataset.tableFactor);
+        };
+      });
+
+      // Step 02 Green Advice Card Update
+      const aiAdviceEl = $('ai-advice-content');
+      if (aiAdviceEl) {
+        if (r.margin <= 0) {
+          aiAdviceEl.innerHTML = '<div class="ai-insight-item danger"><div class="ai-insight-title">🚨 严重警报：单品售价倒挂（边际贡献为负）</div><div class="ai-insight-desc">单件售价 ¥' + money(x.price) + ' 无法覆盖变动成本 ¥' + money(r.v) + '，卖得越多亏损越大！必须立即提价或降低采购成本。</div></div>';
+        } else if (r.breakeven && x.sales * factor < r.breakeven) {
+          const gap = Math.ceil(r.breakeven - x.sales * factor);
+          aiAdviceEl.innerHTML = '<div class="ai-insight-item warning"><div class="ai-insight-title">⚠️ 销量警报：当前预计销量未达保本线</div><div class="ai-insight-desc">距离日均保本线还差 <strong>' + gap + ' ' + currentUnit + '/天</strong>。固定开支（摊位+折旧共 ¥' + money(r.fixed + r.dep) + '/月）压力较大，建议轻资产试卖。</div></div>';
+        } else if (r.economic < 0) {
+          aiAdviceEl.innerHTML = '<div class="ai-insight-item info"><div class="ai-insight-title">⏳ 机会成本提示：账面赚钱，但时间回报偏低</div><div class="ai-insight-desc">月现金结余 ¥' + money(r.cash) + '，但折算实际时薪仅 <strong>¥' + money(r.hourly) + '/小时</strong>（低于兼职时薪 ¥' + money(x.wage) + '/小时）。建议优化动线减少耗时或提升客单价。</div></div>';
+        } else {
+          aiAdviceEl.innerHTML = '<div class="ai-insight-item success"><div class="ai-insight-title">🚀 商业模型初具可行性：具备试卖条件</div><div class="ai-insight-desc">当前日销预计产生健康净现金流（月现金结余 ¥' + money(r.cash) + '，折算时薪 ¥' + money(r.hourly) + '/小时）。建议按照清单开展 3 天实测验证客流。</div></div>';
+        }
+      }
+
+      // Step 06 Scenario Verdict Box Update
+      const verdictEl = $('scenario-verdict');
+      if (verdictEl) {
+        const targetQ = x.sales * factor;
+        const pct = Math.round((factor - 1) * 100);
+        const isCustom = Math.abs(factor - 1) >= 0.001 && Math.abs(factor - 0.8) >= 0.001 && Math.abs(factor - 1.2) >= 0.001;
+
+        let prefix = '📊 <strong>基准情景：</strong>';
+        if (isCustom) {
+          prefix = `🎯 <strong>自定义情景（销量${pct >= 0 ? '增长 +' : '下降 '}${Math.abs(pct)}%）：</strong>`;
+        } else if (factor < 1) {
+          prefix = '🛡 <strong>逆境安全测试（销量下降 20%）：</strong>';
+        } else if (factor > 1) {
+          prefix = '🚀 <strong>旺季乐观测试（销量增长 20%）：</strong>';
+        }
+
+        if (r.cash > 0) {
+          verdictEl.className = 'scenario-verdict-box safe';
+          if (factor < 1) {
+            verdictEl.innerHTML = `${prefix}即使日销降至 <strong>${money(targetQ)} ${currentUnit}</strong>，每月仍有净现金结余 <strong>¥${money(r.cash)}</strong>（扣折旧后盈余 ¥${money(r.profit)}），具备健康抗跌韧性！`;
+          } else if (factor === 1) {
+            verdictEl.innerHTML = `${prefix}在预计日交付量 <strong>${money(targetQ)} ${currentUnit}</strong> 假设下，月经营现金结余为 <strong>¥${money(r.cash)}</strong>，会计保本线为 ${r.breakeven !== null ? displayBreakeven(r.breakeven) + ' ' + currentUnit : '无法保本'}。`;
+          } else {
+            verdictEl.innerHTML = `${prefix}日销达到 <strong>${money(targetQ)} ${currentUnit}</strong>，月经营现金结余将跃升至 <strong>¥${money(r.cash)}</strong>（折合时薪 ¥${money(r.hourly)}/小时）。`;
+          }
+        } else {
+          verdictEl.className = 'scenario-verdict-box danger';
+          const gap = r.breakeven ? Math.ceil(r.breakeven - targetQ) : 0;
+          verdictEl.innerHTML = `🚨 <strong>击穿保本底线！</strong>${prefix}日销降至 <strong>${money(targetQ)} ${currentUnit}</strong>，月现金流出现亏损 <strong>¥${money(r.cash)}</strong>（距离保本线还差 ${gap} ${currentUnit}/天），请务必做好备用金与防亏损预案！`;
+        }
+      }
+
+      updateVisualGauges(x, r);
+      runAIDataDeepAnalysis(x, r);
+    }
+
+    $('trigger-ai-analysis').onclick = () => {
+      const btn = $('trigger-ai-analysis');
+      btn.textContent = '✨ 正在重新穿透…';
+      setTimeout(() => {
+        runAIDataDeepAnalysis(confirmed, calc(confirmed, factor));
+        btn.textContent = '✓ 诊断已刷新';
+        setTimeout(() => btn.textContent = '✨ 刷新深度诊断', 1600);
+      }, 350);
+    };
+
+    
+    // Local Parser Fallback for Clarification
+    function parseClarifyReplyLocal(reply, currentFields = {}) {
+      const updated = {};
+      const explanations = [];
+
+      const itemPairs = [];
+      const pairRegex = /(\d+(?:\.\d+)?)\s*(?:单|份|杯|小时|件)[^0-9\n]{0,25}(\d+(?:\.\d+)?)\s*(?:元|块)/g;
+      let match;
+      while ((match = pairRegex.exec(reply)) !== null) {
+        itemPairs.push({ q: parseFloat(match[1]), p: parseFloat(match[2]) });
+      }
+
+      if (itemPairs.length >= 2) {
+        let relevantPairs = itemPairs;
+        if (itemPairs.length >= 3 && Math.abs(itemPairs[0].q - (itemPairs[1].q + itemPairs[2].q)) < 0.01) {
+          relevantPairs = itemPairs.slice(1);
+        }
+        let totalRevenue = 0, totalQty = 0;
+        const parts = [];
+        for (const item of relevantPairs) {
+          totalRevenue += item.q * item.p;
+          totalQty += item.q;
+          parts.push(`${item.q}单×${item.p}元`);
+        }
+        if (totalQty > 0) {
+          const blendedPrice = Math.round((totalRevenue / totalQty) * 100) / 100;
+          updated.price = {
+            value: blendedPrice,
+            sourceText: `AI加权折算：(${parts.join(' + ')}) ÷ ${totalQty} = ${blendedPrice}元/单`
+          };
+          explanations.push(`已为您智能加权折算多套餐：${parts.join(' + ')}，综合加权平均客单价为 <strong>${blendedPrice} 元/单</strong>，已自动填入单件售价！`);
+          if (totalQty > 0 && (!currentFields.sales || Math.abs(currentFields.sales - totalQty) > 0.01)) {
+            updated.sales = {
+              value: totalQty,
+              sourceText: `套餐合计日单量：${totalQty}单`
+            };
+          }
+        }
+      } else {
+        const pMatch = reply.match(/(?:均价|平均|客单价|售价|定价|每单收费|收费为|卖)[^0-9\n]{0,10}(\d+(?:\.\d+)?)\s*(?:元|块)?/);
+        if (pMatch) {
+          const p = parseFloat(pMatch[1]);
+          if (p > 0) {
+            updated.price = { value: p, sourceText: `补充定价：${p}元` };
+            explanations.push(`已将单件售价更新为 <strong>${p} 元</strong>。`);
+          }
+        }
+      }
+
+      const rawMatch = reply.match(/(?:耗材|原料|进价|打印|相纸|成本)[^0-9\n]{0,12}(\d+(?:\.\d+)?)\s*(?:元|块)/);
+      if (rawMatch && !reply.includes('售价') && !reply.includes('收费')) {
+        const r = parseFloat(rawMatch[1]);
+        updated.raw = { value: r, sourceText: `补充耗材：${r}元` };
+        explanations.push(`已将单件原料/耗材成本更新为 <strong>${r} 元</strong>。`);
+      }
+
+      const packMatch = reply.match(/(?:包装|杯子|吸管|袋子|相框|装裱|包装盒)[^0-9\n]{0,10}(\d+(?:\.\d+)?)\s*(?:元|块)/);
+      if (packMatch) {
+        const pk = parseFloat(packMatch[1]);
+        updated.pack = { value: pk, sourceText: `补充包装：${pk}元` };
+        explanations.push(`已计入单件包装/相框成本 <strong>${pk} 元</strong>。`);
+      }
+
+      const hourMatch = reply.match(/(?:工时|工作|修图|拍摄|服务|出摊)[^0-9\n]{0,10}(\d+(?:\.\d+)?)\s*(?:小时|h)/i);
+      if (hourMatch) {
+        const hr = parseFloat(hourMatch[1]);
+        updated.hours = { value: hr, sourceText: `补充工时：${hr}小时` };
+        explanations.push(`已更新每日工时为 <strong>${hr} 小时</strong>。`);
+      }
+
+      const lossMatch = reply.match(/(?:损耗|废品|坏果|损耗率)[^0-9\n]{0,10}(\d+(?:\.\d+)?)\s*%/);
+      if (lossMatch) {
+        const ls = parseFloat(lossMatch[1]);
+        updated.loss = { value: ls, sourceText: `补充损耗率：${ls}%` };
+        explanations.push(`已更新损耗率为 <strong>${ls}%</strong>。`);
+      }
+
+      const feeMatch = reply.match(/(?:抽成|手续费|佣金|平台费)[^0-9\n]{0,10}(\d+(?:\.\d+)?)\s*%/);
+      if (feeMatch) {
+        const fe = parseFloat(feeMatch[1]);
+        updated.fee = { value: fe, sourceText: `补充抽成：${fe}%` };
+        explanations.push(`已更新平台抽成为 <strong>${fe}%</strong>。`);
+      }
+
+      if (/(?:没有场地费|无场地费|免租|场地费0|租金0|不需要场地|宿舍)/.test(reply)) {
+        updated.rent = { value: 0, sourceText: `补充无场地费` };
+        explanations.push(`已确认无固定场地租金（设为 <strong>0 元</strong>）。`);
+      } else {
+        const rentMatch = reply.match(/(?:场地费|租金|摊位费)[^0-9\n]{0,10}(\d+(?:\.\d+)?)\s*(?:元|块)/);
+        if (rentMatch) {
+          const rt = parseFloat(rentMatch[1]);
+          updated.rent = { value: rt, sourceText: `补充场地费：${rt}元` };
+          explanations.push(`已更新月固定租金为 <strong>${rt} 元</strong>。`);
+        }
+      }
+
+      const investMatch = reply.match(/(?:设备|相机|灯光|工具|投入|前期投入)[^0-9\n]{0,10}(\d+(?:\.\d+)?)\s*(?:元|块)/);
+      if (investMatch) {
+        const inv = parseFloat(investMatch[1]);
+        updated.investment = { value: inv, sourceText: `补充设备投入：${inv}元` };
+        explanations.push(`已更新初始设备投入为 <strong>${inv} 元</strong>。`);
+      }
+
+      return {
+        mode: 'rules-clarify',
+        success: Object.keys(updated).length > 0,
+        explanation: explanations.join(' ') || '已成功记录您的补充信息，由于未检测到明确的数值变动，保持现有参数不变。',
+        updatedFields: updated
+      };
+    }
+
+    function handleClarifySuccess(data) {
+      let count = 0;
+      const updatedNames = [];
+      for (const [k, info] of Object.entries(data.updatedFields || {})) {
+        const el = $(k);
+        if (el && Number.isFinite(+info.value)) {
+          el.value = info.value;
+          el.classList.remove('ai-updated-glow');
+          void el.offsetWidth;
+          el.classList.add('ai-updated-glow');
+
+          const srcEl = $('source-' + k);
+          if (srcEl) {
+            srcEl.textContent = 'AI追问更新：' + (info.sourceText || '用户补充');
+            srcEl.className = 'source extracted';
+          }
+
+          const advDetails = $('advanced-details');
+          if (advDetails && el.closest('#fields-advanced')) {
+            advDetails.open = true;
+          }
+
+          count++;
+          const spec = specs.find(s => s[0] === k);
+          updatedNames.push(document.querySelector(`[data-field="${k}"] .field-label`)?.textContent || k);
+        }
+      }
+
+      const fbBox = $('reply-feedback-box');
+      if (fbBox) {
+        fbBox.style.display = 'block';
+        if (count > 0) {
+          fbBox.style.background = '#f0fdf4';
+          fbBox.style.border = '1px solid var(--primary-border)';
+          fbBox.style.color = '#166534';
+          fbBox.innerHTML = `<strong>已补充参数，请核对后确认：</strong><br>${safeText(data.explanation)}<br><span style="font-size:12px">${safeText(updatedNames.join('、'))}</span>`;
+        } else {
+          fbBox.style.background = '#fffbeb';
+          fbBox.style.border = '1px solid var(--accent-border)';
+          fbBox.style.color = '#92400e';
+          fbBox.textContent = data.explanation || '暂无可更新的数字，请继续补充。';
+        }
+      }
+
+      pendingReview = true;
+      renderSceneUI();
+      render();
+      renderImpact();
+      renderActions();
+      drawTrials();
+    }
+
+    // Submit Reply Handler
+    if ($('btn-submit-reply')) {
+      $('btn-submit-reply').onclick = async () => {
+        const inputEl = $('ai-reply-input');
+        const reply = inputEl ? inputEl.value.trim() : '';
+        if (!reply) {
+          alert('请先输入您的回答或补充细节。');
+          return;
+        }
+
+        const btn = $('btn-submit-reply');
+        const oldText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '✨ AI 正在加权折算并更新表单…';
+
+        const targetTag = $('reply-target-tag')?.textContent?.trim() || '';
+        const idea = $('idea')?.value?.trim() || '';
+        const replySceneVersion = sceneVersion;
+
+        const currentFields = {};
+        for (const [k] of specs) {
+          if ($(k)?.value.trim() !== '') currentFields[k] = +$(k).value;
+        }
+
+        try {
+          let res;
+          try {
+            res = await fetch('/kaizhangqian/api/clarify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ idea, question: targetTag, reply, currentFields })
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+          } catch {
+            res = await fetch('/api/clarify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ idea, question: targetTag, reply, currentFields })
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+          }
+          const data = await res.json();
+          if (replySceneVersion === sceneVersion) handleClarifySuccess(data);
+        } catch (err) {
+          console.warn('API error, using local fallback:', err);
+          const fallbackData = parseClarifyReplyLocal(reply, currentFields);
+          if (replySceneVersion === sceneVersion) handleClarifySuccess(fallbackData);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      };
+    }
+
+    // Quick chips click handlers
+    document.querySelectorAll('.chip-btn').forEach(btn => {
+      btn.onclick = () => {
+        if ($('ai-reply-input')) {
+          $('ai-reply-input').value = btn.dataset.preset;
+          $('ai-reply-input').focus();
+        }
+      };
+    });
+
+    // Form Submit Event Handler
+    $('form').addEventListener('submit', e => {
+      e.preventDefault();
+      if (extractionController) { $('error').textContent = '正在识别当前场景，请稍后确认。'; return; }
+      const x = {};
+      for (const [k] of specs) {
+        const inputEl = $(k);
+        const hidden = document.querySelector(`[data-field="${k}"]`)?.hidden;
+        const value = hidden && inputEl?.value.trim() === '' ? '0' : (inputEl ? inputEl.value : '');
+        if (value.trim() === '' || !Number.isFinite(+value) || +value < 0) {
+          $('error').textContent = `请补充「${document.querySelector(`[data-field="${k}"] .field-label`)?.textContent || k}」；没有此项支出请填写 0。`;
+          if (inputEl?.closest('#fields-advanced')) $('advanced-details').open = true;
+          inputEl?.focus();
+          return;
+        }
+        x[k] = +value;
+      }
+      if (x.days <= 0 || x.days > 31 || !Number.isInteger(x.days) || x.life <= 0 || x.hours <= 0 || x.hours > 24 || x.loss >= 100 || x.fee > 100) {
+        $('error').textContent = '营业天数须为 1–31 整数；折旧月数须大于 0；工时须为 0-24；损耗率须小于 100%，抽成不超过 100%。';
+        return;
+      }
+      $('error').textContent = '';
+      confirmed = x;
+      pendingReview = false;
+      renderSceneUI();
+      render();
+      renderImpact();
+      renderActions();
+      drawTrials();
+    });
+
+    // Fallback Regex Patterns
+    const patterns = {
+      price: /(?:一杯卖|每杯卖|每杯|每份卖|每份|每双收费|每双|每件收费|每件|每次收费|每次|每单收费|每单|每小时收费|每小时|售价|卖价|收费)\s*(\d+(?:\.\d+)?)/,
+      raw: /(?:原料成本|一杯成本|进货成本|进价|相纸和打印成本|打印成本|耗材成本|清洁剂成本)\s*(\d+(?:\.\d+)?)/,
+      sales: /(?:每天|一天|每周接|预计卖)\s*(?:大概|预计)?\s*(?:卖|接)?\s*(\d+(?:\.\d+)?)/,
+      days: /(?:每月|一个月)\s*(?:营业|出摊|授课|服务)?\s*(\d+(?:\.\d+)?)/,
+      rent: /(?:摊位费|场地费)\s*(?:每月|一个月)?\s*(\d+(?:\.\d+)?)/,
+      pack: /(?:包装|耗材|清洁剂和包装成本)\s*(?:成本)?\s*(\d+(?:\.\d+)?)/,
+      fee: /(?:平台抽成|抽成)\s*(\d+(?:\.\d+)?)\s*%/,
+      investment: /(?:设备投入|设备花费|设备投资|相机投入)\s*(\d+(?:\.\d+)?)/,
+      hours: /(?:每天工作|每日工时|每天投入总工时)\s*(\d+(?:\.\d+)?)/,
+      other: /(?:推广费|交通和打印|其他支出)\s*(?:每月)?\s*(\d+(?:\.\d+)?)/
+    };
+
+    // AI Natural Language Extraction Handler
+    $('parse').onclick = async () => {
+      const btn = $('parse');
+      const text = $('idea').value.trim();
+      if (!text) {
+        $('status').textContent = '请先输入你的创业想法描述。';
+        return;
+      }
+      extractionController?.abort();
+      const controller = new AbortController();
+      extractionController = controller;
+      const requestVersion = ++extractionVersion;
+      sceneVersion++;
+      const timeout = setTimeout(() => controller.abort(), 32000);
+      btn.disabled = true;
+      pendingReview = true;
+      // Manual text replaces the preset: reset labels/visibility so a prior
+      // scenario (for example snacks) cannot leak into a custom business.
+      const presetTexts = Object.values(templateData || {}).map(t => t.text);
+      const isCustomText = !presetTexts.includes(text);
+      const matchedTemplate = Object.values(templateData || {}).find(t => t.text === text);
+      let manualUnit = matchedTemplate?.unit || '';
+      if (isCustomText) {
+        setScene(detectSceneFromText(text));
+        const customUnit = inferTransactionUnit(text);
+        if (customUnit) {
+          manualUnit = customUnit;
+          if (typeof applyUnit === 'function') applyUnit(manualUnit);
+        }
+        const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
+        if (heading) heading.textContent = '自定义场景 · 开张前测算';
+        if ($('scenario-notice')) $('scenario-notice').textContent = `这是自定义经营场景（${sceneProfile.label}）；AI 将按你的描述识别单位、成本和工作方式。`;
+        // A custom description starts a fresh model. Clear values from the
+        // previously selected template so missing AI fields cannot inherit
+        // stale prices, costs or volumes from another business.
+        for (const [k] of specs) {
+          const input = $(k);
+          if (input) input.value = '';
+          const src = $('source-' + k);
+          if (src) {
+            src.textContent = '待补充 · 等待 AI 识别';
+            src.className = 'source';
+          }
+        }
+      }
+      factor = 1;
+      customFactor = null;
+      if ($('reply-feedback-box')) $('reply-feedback-box').style.display = 'none';
+      $('ai-reply-input').value = '';
+      render();
+      btn.textContent = '✨ AI 正在深度理解…';
+      $('status').textContent = '正在识别价格、成本、销量与潜在成本漏项…';
+      if ($('ai-questions-list')) $('ai-questions-list').innerHTML = '<div class="hint">正在生成适用于当前场景的追问…</div>';
+
+      try {
+        const res = await fetch('/kaizhangqian/api/extract', {
+          method: 'POST',
+          signal: controller.signal,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, schemaVersion: '0.1' })
+        });
+        if (!res.ok) throw Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (requestVersion !== extractionVersion) return;
+        if (data.scene && data.scene.key) {
+          const sceneMeta = matchedTemplate
+            ? { unit: matchedTemplate.unit }
+            : { ...data.scene, unit: manualUnit || data.scene.unit };
+          setScene(data.scene.key, sceneMeta);
+          if (!matchedTemplate && $('scenario-notice')) {
+            $('scenario-notice').textContent = `已识别为${sceneProfile.label}：${sceneProfile.summary} 未填写的数字请补充后再确认。`;
+          }
+        }
+        // A successful extraction always invalidates the previous calculation.
+        // The user must review and confirm the newly recognized parameters.
+        pendingReview = true;
+        
+        let n = 0;
+        for (const [k, info] of Object.entries(data.fields || {})) {
+          if ($(k) && info && Number.isFinite(+info.value)) {
+            $(k).value = info.value;
+            const srcEl = $('source-' + k);
+            if (srcEl) {
+              srcEl.textContent = (String(data.mode).startsWith('rules') ? '规则识别：' : 'AI识别：') + (info.sourceText || '请核实');
+              srcEl.className = 'source extracted';
+            }
+            n++;
+          }
+        }
+        for (const [k] of specs) {
+          if (!(k in (data.fields || {}))) {
+            if (isCustomText && $(k)) $(k).value = '';
+            const srcEl = $('source-' + k);
+            if (srcEl) {
+              srcEl.textContent = isCustomText ? '待补充 · 原文未提供' : '演示假设 · 待核对';
+              srcEl.className = 'source';
+            }
+          }
+        }
+        // Service descriptions such as “清洁剂和包装成本” are normalized
+        // by the backend into the visible direct-consumables field. Clear a
+        // template's stale packaging preset so the same cost is not counted
+        // twice after switching from another scenario.
+        if (data.scene?.kind === 'service' && data.fields?.raw && !data.fields?.pack && $('pack')) {
+          $('pack').value = 0;
+          const packSource = $('source-pack');
+          if (packSource) {
+            packSource.textContent = '场景联动：已并入直接耗材';
+            packSource.className = 'source extracted';
+          }
+        }
+
+        // Prefer the transaction unit from sales/price. Other fields (such as
+        // daily work hours) may also carry a unit and must not overwrite the
+        // business quantity label (e.g. shoe pairs becoming “小时”).
+        const unitCandidates = [
+          data.fields?.sales?.unit,
+          data.fields?.price?.unit,
+        ].map(v => String(v || ''));
+        const detectedUnit = unitCandidates.find(u => /人次|小时|课时|公斤|千克|双|杯|份|件|单|次|套|条|张|本|台|瓶|盒/.test(u));
+        if (detectedUnit && !manualUnit && typeof applyUnit === 'function') {
+          applyUnit(detectedUnit.match(/人次|小时|课时|公斤|千克|双|杯|份|件|单|次|套|条|张|本|台|瓶|盒/)[0]);
+        }
+
+        const qs = (data.questions || []).slice(0, 6);
+        const modeLabel = String(data.mode || 'AI').startsWith('rules') ? '规则回退引擎' : 'OpenClaw / DeepSeek';
+        $('ai-mode-tag').textContent = modeLabel;
+        $('ai-summary-text').textContent = `${modeLabel} 已识别为「${sceneProfile.label}」，提取 ${n} 个关键经营参数。请按当前场景核对下方成本与工时：`;
+
+        if (qs.length) {
+          renderExpandableQuestions(qs);
+        } else if ($('ai-questions-list')) {
+          $('ai-questions-list').innerHTML = '<div class="hint">当前没有新增追问；请核对已识别字段和待补充项。</div>';
+        }
+
+        const recommendation = typeof data.recommendation === 'string' && data.recommendation.trim() ? (' AI建议：' + data.recommendation.trim()) : '';
+        $('status').textContent = `已完成智能提取（匹配 ${n} 项）。请核对参数后点击“确认参数，更新测算”。${recommendation}`;
+
+        // Hide the previous scenario's figures immediately. Without this
+        // render call a manual custom-scene extraction could leave the old
+        // decision, metrics and charts visible until the user confirmed.
+        renderSceneUI();
+        render();
+
+      } catch (e) {
+        if (requestVersion !== extractionVersion) return;
+        let n = 0;
+        for (const [k, re] of Object.entries(patterns)) {
+          const m = text.match(re);
+          if (m) {
+            $(k).value = m[1];
+            const srcEl = $('source-' + k);
+            if (srcEl) {
+              srcEl.textContent = '规则回退提取 · 待确认';
+              srcEl.className = 'source extracted';
+            }
+            n++;
+          }
+        }
+        // Weekly amounts cannot be treated as daily amounts in offline mode.
+        if (/每周/.test(text)) { $('sales').value = ''; $('source-sales').textContent = '待补充 · 请换算为每营业日交付量'; }
+        if (/每月[^，。；]{0,12}\d+\s*周/.test(text)) { $('days').value = ''; $('source-days').textContent = '待补充 · 请填写每月实际营业天数'; }
+        if (sceneProfile.kind === 'service' && $('raw').value === '' && $('pack').value !== '') { $('raw').value = $('pack').value; $('pack').value = 0; }
+        $('ai-mode-tag').textContent = '本地规则备用模式';
+        $('ai-summary-text').textContent = `在线接口暂不可用，已切换本地规则匹配提取了 ${n} 项已知数据。`;
+        if ($('ai-questions-list')) $('ai-questions-list').innerHTML = '<div class="hint">规则备用模式未生成场景追问，请根据待补充字段手动核对。</div>';
+        pendingReview = true;
+        render();
+        $('status').textContent = `规则引擎已提取 ${n} 项。请核对参数后点击“确认参数，更新测算”。`;
+      } finally {
+        clearTimeout(timeout);
+        if (requestVersion === extractionVersion) {
+          extractionController = null;
+          btn.disabled = false;
+          btn.textContent = '✨ 智能提取已知信息';
+        }
+      }
+    };
+
+    // Scenario Factor Switcher & Custom Factor Management
+    function selectScenarioFactor(newFactor) {
+      factor = Math.max(0, newFactor);
+      const isPreset = [0.8, 1, 1.2].some(f => Math.abs(f - factor) < 0.001);
+
+      document.querySelectorAll('[data-factor]').forEach(t => {
+        t.setAttribute('aria-pressed', String(Math.abs(+t.dataset.factor - factor) < 0.001));
+      });
+
+      const btnCustom = $('btn-custom-factor');
+      if (btnCustom) {
+        if (!isPreset) {
+          const p = Math.round((factor - 1) * 100);
+          btnCustom.setAttribute('aria-pressed', 'true');
+          btnCustom.textContent = `🎯 自定义 (${p >= 0 ? '+' : ''}${p}%)`;
+        } else {
+          btnCustom.setAttribute('aria-pressed', 'false');
+          if (customFactor !== null) {
+            const p = Math.round((customFactor - 1) * 100);
+            btnCustom.textContent = `⚙️ 自定义 (${p >= 0 ? '+' : ''}${p}%)`;
+          } else {
+            btnCustom.textContent = '⚙️ 自定义情景';
+          }
+        }
+      }
+
+      render();
+    }
+
+    document.querySelectorAll('[data-factor]').forEach(b => b.onclick = () => {
+      selectScenarioFactor(+b.dataset.factor);
+    });
+
+    // Custom Factor Drawer Toggle
+    const btnCustomToggle = $('btn-custom-factor');
+    const customDrawer = $('custom-scenario-drawer');
+    if (btnCustomToggle && customDrawer) {
+      btnCustomToggle.onclick = () => {
+        const isHidden = customDrawer.style.display === 'none';
+        customDrawer.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) {
+          syncCustomQtyFromPct();
+          $('custom-factor-pct')?.focus();
+        }
+      };
+    }
+
+    function syncCustomQtyFromPct() {
+      const pctInput = $('custom-factor-pct');
+      const qtyInput = $('custom-factor-qty');
+      if (pctInput && qtyInput) {
+        const p = parseFloat(pctInput.value) || 0;
+        const baseSales = confirmed.sales || 0;
+        const q = Math.max(0, baseSales * (1 + p / 100));
+        qtyInput.value = q.toFixed(1);
+      }
+    }
+
+    function syncCustomPctFromQty() {
+      const pctInput = $('custom-factor-pct');
+      const qtyInput = $('custom-factor-qty');
+      if (pctInput && qtyInput) {
+        const q = parseFloat(qtyInput.value) || 0;
+        const baseSales = confirmed.sales || 0;
+        if (baseSales > 0) {
+          const p = Math.round(((q - baseSales) / baseSales) * 100);
+          pctInput.value = p;
+        }
+      }
+    }
+
+    if ($('custom-factor-pct')) {
+      $('custom-factor-pct').addEventListener('input', syncCustomQtyFromPct);
+    }
+    if ($('custom-factor-qty')) {
+      $('custom-factor-qty').addEventListener('input', syncCustomPctFromQty);
+    }
+
+    function applyCustomFactorValue(p) {
+      const parsedPct = parseFloat(p);
+      if (isNaN(parsedPct)) return;
+      $('custom-factor-pct').value = parsedPct;
+      syncCustomQtyFromPct();
+
+      customFactor = Math.max(0, 1 + parsedPct / 100);
+      selectScenarioFactor(customFactor);
+    }
+
+    if ($('apply-custom-factor')) {
+      $('apply-custom-factor').onclick = () => {
+        applyCustomFactorValue($('custom-factor-pct').value);
+      };
+    }
+
+    document.querySelectorAll('.quick-factor-btn').forEach(btn => {
+      btn.onclick = () => {
+        applyCustomFactorValue(btn.dataset.pct);
+      };
+    });
+
+    $('export').onclick = () => window.print();
+
+    // Copy Summary to Clipboard
+    $('copy-summary').onclick = () => {
+      const x = confirmed, r = calc(x, factor);
+      const decTitle = $('decision').querySelector('strong')?.textContent || '';
+      const decWhy = $('decision').querySelector('p')?.textContent || '';
+      const text = `【开张前 · 商业测算摘要】
+项目：${$('idea').value.trim().slice(0, 35)}...
+情景：${$('scenario-label').textContent}
+---------------------------------
+• 月经营现金结余：¥ ${money(r.cash)}
+• 扣折旧后月盈余：¥ ${money(r.profit)}
+• 日均会计保本量：${r.breakeven !== null ? displayBreakeven(r.breakeven) + ' ' + currentUnit : '无法保本'}
+• 投资回收期：${r.payback !== null ? money(r.payback) + ' 个月' : '无法回本'}
+• 折合实际时薪：¥ ${money(r.hourly)}/小时（兼职参考 ¥ ${money(x.wage)}/小时）
+---------------------------------
+核心诊断：${decTitle}
+${decWhy}
+（测算来源：开张前 · 青年商业推演引擎）`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = $('copy-summary');
+        const old = btn.textContent;
+        btn.textContent = '✓ 摘要已复制！';
+        setTimeout(() => btn.textContent = old, 2000);
+      }).catch(() => {
+        alert('复制失败，请手动截屏或导出 PDF。');
+      });
+    };
+
+    // Plan Storage Management inside Tab 3
+    const plansKey = "kaizhangqian:plans";
+    function readPlans() {
+      try { return JSON.parse(localStorage.getItem(plansKey) || "[]"); } catch { return []; }
+    }
+    function drawPlans() {
+      const box = $("saved-plans");
+      if (!box) return;
+      const ps = readPlans();
+      box.innerHTML = ps.length 
+        ? ps.map((a, i) => `
+          <div class="breakdown">
+            <span><strong>${safeText(a.name)}</strong> · ${safeText(a.scene?.label || '未标注场景')} · ${safeText(a.time)}</span>
+            <span>
+              <button type="button" class="header-btn" data-load="${i}">加载</button>
+              <button type="button" class="header-btn" data-delete-plan="${i}">删除</button>
+            </span>
+          </div>`).join("") 
+        : "暂无本地保存方案。";
+
+      box.querySelectorAll("[data-load]").forEach(b => b.onclick = () => {
+        const a = readPlans()[+b.dataset.load];
+        invalidateExtraction();
+        if (typeof a.idea === 'string') $('idea').value = a.idea;
+        if (a.scene && a.scene.key) setScene(a.scene.key, { unit: a.scene.unit });
+        for (const [k] of specs) {
+          if ($(k)) $(k).value = a.values[k];
+          $('source-' + k).textContent = '已保存方案 · 可修改后重新确认';
+        }
+        confirmed = a.values;
+        factor = 1;
+        customFactor = null;
+        pendingReview = false;
+        renderSceneUI();
+        render();
+        drawTrials();
+      });
+
+      box.querySelectorAll("[data-delete-plan]").forEach(b => b.onclick = () => {
+        const a = readPlans();
+        a.splice(+b.dataset.deletePlan, 1);
+        localStorage.setItem(plansKey, JSON.stringify(a));
+        drawPlans();
+      });
+    }
+
+    $("save-plan").onclick = () => {
+      if (pendingReview) return;
+      const name = prompt("请为这次测算起一个方案名称：", sceneProfile.title);
+      if (!name) return;
+      const ps = readPlans();
+      ps.unshift({ name: name.slice(0, 30), time: new Date().toLocaleString("zh-CN"), idea: $('idea').value.trim(), scene: { key: sceneProfile.key, unit: currentUnit, label: sceneProfile.label }, values: {...confirmed} });
+      localStorage.setItem(plansKey, JSON.stringify(ps.slice(0, 10)));
+      drawPlans();
+    };
+
+    $("clear-plans").onclick = () => {
+      if (confirm("确定要清空全部保存在本机的历史方案吗？")) {
+        localStorage.removeItem(plansKey);
+        drawPlans();
+      }
+    };
+
+    $("export-json").onclick = () => {
+      const blob = new Blob([JSON.stringify({
+        product: "开张前",
+        version: "1.0",
+        exportedAt: new Date().toISOString(),
+        scene: { key: sceneProfile.key, unit: currentUnit, label: sceneProfile.label },
+        values: confirmed,
+        scenarios: [0.8, 1, 1.2].map(f => calc(confirmed, f))
+      }, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "开张前-商业测算数据.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    // Trial Run Logging & Reality Check
+    function trialRows() {
+      try { return JSON.parse(localStorage.getItem("kaizhangqian:trials") || "[]"); } catch { return []; }
+    }
+    function drawTrials() {
+      const box = $("trial-list");
+      if (!box) return;
+      const rows = trialRows().map((r, index) => ({...r, index})).filter(r => r.scene?.key === sceneProfile.key && r.scene?.unit === currentUnit && r.idea === $('idea').value.trim());
+      box.innerHTML = rows.length 
+        ? rows.map((r, i) => `
+          <div class="breakdown">
+            <span>${safeText(r.date)} · ${sceneProfile.kind === 'service' ? '服务量' : '销量'} ${r.sales}${safeText(r.scene.unit)} · 收入 ¥${r.revenue} · 成本 ¥${r.cost} · ${r.hours}工时</span>
+            <button type="button" class="header-btn" data-del-trial="${r.index}">删除</button>
+          </div>`).join("") 
+        : "暂无试卖记录。";
+
+      const avg = rows.length ? rows.reduce((a, r) => a + Number(r.sales), 0) / rows.length : 0;
+      $("trial-summary").textContent = rows.length 
+        ? `已实测记录 ${rows.length} 天，平均${sceneProfile.kind === 'service' ? '日服务量' : '日销量'} ${avg.toFixed(1)} ${currentUnit}（基准测算值为 ${confirmed.sales} ${currentUnit}）。` 
+        : `建议连续记录至少 3 天真实${sceneProfile.kind === 'service' ? '服务' : '经营'}数据，用于修正测算假设。`;
+
+      box.querySelectorAll('[data-del-trial]').forEach(b => b.onclick = () => {
+        const a = trialRows();
+        a.splice(+b.dataset.delTrial, 1);
+        localStorage.setItem('kaizhangqian:trials', JSON.stringify(a));
+        drawTrials();
+      });
+    }
+
+    $("trial-date").value = new Date().toISOString().slice(0, 10);
+    $("add-trial").onclick = () => {
+      if (pendingReview) return;
+      if (['trial-sales','trial-revenue','trial-cost','trial-hours'].some(id => $(id).value.trim() === '')) { $('trial-summary').textContent = '请完整填写本次实测的数量、收入、成本和工时。'; return; }
+      const r = {
+        scene: {key: sceneProfile.key, unit: currentUnit},
+        idea: $('idea').value.trim(),
+        date: $("trial-date").value,
+        sales: +$("trial-sales").value,
+        revenue: +$("trial-revenue").value,
+        cost: +$("trial-cost").value,
+        hours: +$("trial-hours").value,
+        note: $("trial-note").value.trim()
+      };
+      if (!r.date || !Number.isFinite(r.sales) || !Number.isFinite(r.revenue) || !Number.isFinite(r.cost) || !Number.isFinite(r.hours) || r.sales < 0 || r.revenue < 0 || r.cost < 0 || r.hours < 0) {
+        $("trial-summary").textContent = "请完整填写真实非负数字。";
+        return;
+      }
+      const a = trialRows();
+      a.unshift(r);
+      localStorage.setItem("kaizhangqian:trials", JSON.stringify(a.slice(0, 31)));
+      $("trial-note").value = "";
+      drawTrials();
+    };
+
+    // Preset Scenario Templates
+    const templateData = {
+      lemon: {
+        unit: '杯',
+        title: '校园柠檬茶',
+        text: '我想在校园摆摊卖柠檬茶，一杯卖8元，原料成本3元，每天卖30杯，每月营业20天，摊位费每月500元。',
+        advCount: 9,
+        notice: '柠檬茶为高周转饮品摊位，先核对售价、日销与原料成本，外卖杯与损耗已在折叠区预设。'
+      },
+      snack: {
+        unit: '份',
+        title: '宿舍零食小铺',
+        text: '我想在宿舍卖零食礼包，每份卖15元，进货成本8元，每天预计卖20份，每月营业18天。',
+        advCount: 9,
+        notice: '宿舍零售无高额摊位费，核心在于进销差价与日常动销，折叠区已自动精简。'
+      },
+      tutor: {
+        unit: '小时',
+        title: '大学生家教服务',
+        text: '我想做大学生家教，每小时收费80元，每周接6小时，每周授课2天，每月授课4周，没有场地费。',
+        advCount: 4,
+        notice: '家教为时间服务型创业：主要关注课时单价、可授课时长、备课通勤和平台获客成本。',
+        scene: 'skill'
+      },
+      photo: {
+        unit: '单',
+        title: '校园摄影服务',
+        text: '我想在校园做证件照和毕业照摄影，每单平均收费60元，相纸和打印成本8元，每天接8单，每月服务22天，设备投入6000元，每天工作5小时。',
+        advCount: 9,
+        notice: '摄影属于创意服务：除了耗材，还要把拍摄、沟通、修图和交付工时算进去。',
+        scene: 'creative'
+      },
+      wash: {
+        unit: '双',
+        title: '宿舍洗鞋服务',
+        text: '我想在宿舍做洗鞋服务，每双收费25元，每天接12双，每月服务22天，清洁剂和包装成本5元，设备投入1500元，每天工作4小时。',
+        advCount: 9,
+        notice: '洗鞋属于按单交付服务：重点核对清洁剂、包装、返工损耗和每双交付工时。',
+        scene: 'creative'
+      }
+    };
+
+    function applyTemplate(key) {
+      const t = templateData[key];
+      if (!t) return;
+      const presets = {
+        lemon: {price:8,sales:30,raw:3,days:20,rent:500,pack:.5,loss:10,fee:0,other:200,investment:2000,life:24,hours:3,wage:20},
+        snack: {price:15,sales:20,raw:8,days:18,rent:0,pack:0,loss:0,fee:0,other:100,investment:0,life:24,hours:2,wage:20},
+        tutor: {price:80,sales:3,raw:0,days:8,rent:0,pack:0,loss:0,fee:0,other:0,investment:0,life:24,hours:4,wage:20},
+        photo: {price:60,sales:8,raw:8,days:22,rent:0,pack:0,loss:0,fee:0,other:100,investment:6000,life:24,hours:5,wage:20},
+        wash: {price:25,sales:12,raw:5,days:22,rent:0,pack:0,loss:0,fee:0,other:100,investment:1500,life:24,hours:4,wage:20}
+      };
+      for (const [k] of specs) {
+        $(k).value = presets[key][k];
+        $('source-' + k).textContent = '演示假设 · 待核对';
+        $('source-' + k).className = 'source';
+      }
+      setScene(t.scene || detectSceneFromText(t.text), { unit: t.unit });
+      $('idea').value = t.text;
+
+      // Update scenario pill active class
+      document.querySelectorAll('[data-template]').forEach(b => {
+        b.classList.toggle('active', b.dataset.template === key);
+      });
+
+      if ($('scenario-notice')) $('scenario-notice').textContent = t.notice;
+
+      // Set tailored defaults for tutor if selected
+      if (key === 'tutor') {
+        if ($('price')) $('price').value = 80;
+        if ($('sales')) $('sales').value = 3;
+        if ($('days')) $('days').value = 8;
+        if ($('hours')) $('hours').value = 4;
+        if ($('rent')) $('rent').value = 0;
+        if ($('raw')) $('raw').value = 0;
+        if ($('pack')) $('pack').value = 0;
+        if ($('loss')) $('loss').value = 0;
+      } else if (key === 'lemon') {
+        if ($('price')) $('price').value = 8;
+        if ($('sales')) $('sales').value = 30;
+        if ($('days')) $('days').value = 20;
+        if ($('raw')) $('raw').value = 3;
+        if ($('pack')) $('pack').value = 0.5;
+        if ($('loss')) $('loss').value = 10;
+        if ($('rent')) $('rent').value = 500;
+      } else if (key === 'snack') {
+        if ($('price')) $('price').value = 15;
+        if ($('sales')) $('sales').value = 20;
+        if ($('days')) $('days').value = 18;
+        if ($('raw')) $('raw').value = 8;
+        if ($('pack')) $('pack').value = 0;
+        if ($('loss')) $('loss').value = 0;
+        if ($('rent')) $('rent').value = 0;
+      } else if (key === 'photo') {
+        if ($('price')) $('price').value = 60;
+        if ($('sales')) $('sales').value = 8;
+        if ($('days')) $('days').value = 22;
+        if ($('raw')) $('raw').value = 8;
+        if ($('pack')) $('pack').value = 0;
+        if ($('loss')) $('loss').value = 0;
+        if ($('fee')) $('fee').value = 0;
+        if ($('investment')) $('investment').value = 6000;
+        if ($('hours')) $('hours').value = 5;
+      } else if (key === 'wash') {
+        if ($('price')) $('price').value = 25;
+        if ($('sales')) $('sales').value = 12;
+        if ($('days')) $('days').value = 22;
+        if ($('raw')) $('raw').value = 5;
+        if ($('pack')) $('pack').value = 0;
+        if ($('loss')) $('loss').value = 0;
+        if ($('fee')) $('fee').value = 0;
+        if ($('investment')) $('investment').value = 1500;
+        if ($('hours')) $('hours').value = 4;
+      }
+
+      const heading = document.querySelector('#scenario-label')?.parentElement?.querySelector('h2');
+      if (heading) heading.textContent = t.title + ' · 开张前测算';
+      
+      $('status').textContent = `已载入 ${t.title} 场景；单位为 ${t.unit}，已智能隐藏无关字段。正在请求 AI 提取…`;
+      if ($('ai-questions-list')) $('ai-questions-list').innerHTML = '<div class="hint">正在切换到当前场景的 AI 追问…</div>';
+      pendingReview = true;
+      render();
+      $('parse').onclick();
+    }
+
+    document.querySelectorAll('[data-template]').forEach(b => {
+      b.onclick = () => applyTemplate(b.dataset.template);
+    });
+
+    function applyUnit(unit) {
+      if (!validUnit(unit)) return;
+      currentUnit = unit;
+      renderSceneUI();
+    }
+
+    function invalidateExtraction() {
+      extractionVersion++;
+      sceneVersion++;
+      extractionController?.abort();
+      extractionController = null;
+      $('parse').disabled = false;
+      $('parse').textContent = '✨ 智能提取已知信息';
+      pendingReview = true;
+      $('error').textContent = '';
+    }
+    $('idea').addEventListener('input', () => {
+      invalidateExtraction();
+      document.querySelectorAll('[data-template]').forEach(b => b.classList.remove('active'));
+      $('status').textContent = '描述已更改，请重新提取，核对当前场景参数。';
+      render();
+    });
+    $('scene-kind').onchange = () => {
+      invalidateExtraction();
+      setScene($('scene-kind').value, {unit: currentUnit});
+      $('status').textContent = '已修改经营方式，请核对直接成本和交付量后确认。';
+      render();
+    };
+    $('business-unit').onchange = () => {
+      const unit = validUnit($('business-unit').value.trim());
+      if (!unit) { $('business-unit').value = currentUnit; $('error').textContent = '计价单位请填写 1–8 个文字，例如双、小时、套。'; return; }
+      invalidateExtraction();
+      applyUnit(unit);
+      $('status').textContent = '已修改计价单位，请同步核对售价、直接成本和交付量；数字不会自动换算。';
+      render();
+    };
+    $('fields').addEventListener('input', event => {
+      if (!event.target.id) return;
+      pendingReview = true;
+      sceneVersion++;
+      const source = $('source-' + event.target.id);
+      if (source) { source.textContent = '用户填写 · 待确认'; source.className = 'source'; }
+      render();
+    });
+
+    // Initialize Page
+    setScene('beverage');
+    render();
+    drawPlans();
+    renderImpact();
+    renderActions();
+    drawTrials();
+    if (typeof bindQuestionPillClick === 'function') {
+      bindQuestionPillClick($('ai-questions-list'));
+    }
+  </script>
+</body>
+</html>
