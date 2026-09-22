@@ -1493,13 +1493,16 @@
               <label>出摊日期<input id="trial-date" type="date"></label>
               <label>实际销量（<span class="unit-text">杯</span>）<input id="trial-sales" type="number" min="0"></label>
               <label>实际总营收（元）<input id="trial-revenue" type="number" min="0" step="0.01"></label>
-              <label>实际耗材成本（元）<input id="trial-cost" type="number" min="0" step="0.01"></label>
+              <label>实际变动成本（元，原料+包装）<input id="trial-cost" type="number" min="0" step="0.01"></label>
               <label>总工时（小时）<input id="trial-hours" type="number" min="0" step="0.5"></label>
               <label>出摊环境备注<input id="trial-note" type="text" maxlength="80" placeholder="天气、人流、突发情况"></label>
             </div>
             <button id="add-trial" type="button" class="btn-primary" style="margin-top: 12px;">保存实测数据</button>
             <p id="trial-summary" class="hint" style="margin-top: 8px; font-weight: 500;"></p>
             <div id="trial-list" class="breakdown-table" style="margin-top: 10px;"></div>
+            <!-- 预测 vs 实际对照（P0-5） -->
+            <div id="trial-compare" style="margin-top: 14px;"></div>
+            <button id="export-verification" type="button" class="header-btn" style="margin-top: 10px;" hidden>⬇️ 导出验证报告（JSON）</button>
           </div>
 
           <!-- Step 10: Save Plans -->
@@ -1530,6 +1533,7 @@
   <!-- 标准化数据合同 + 确定性计算引擎（与 test/ 共用同一实现，P0-2 / P0-4） -->
   <script src="/kz-schema.js"></script>
   <script src="/kz-calc.js"></script>
+  <script src="/kz-trial.js"></script>
   <script>
     const SCENE_PROFILES = {
       beverage: {
@@ -3083,6 +3087,30 @@ ${decWhy}
     function trialRows() {
       try { return JSON.parse(localStorage.getItem("kaizhangqian:trials") || "[]"); } catch { return []; }
     }
+    // 当前场景 / 当前描述下的实测记录
+    function currentTrialRows() {
+      return trialRows().filter(r => r.scene?.key === sceneProfile.key && r.scene?.unit === currentUnit && r.idea === $('idea').value.trim());
+    }
+    function trialBaseline() {
+      return { price: confirmed.price, raw: confirmed.raw, pack: confirmed.pack, loss: confirmed.loss, fee: confirmed.fee, sales: confirmed.sales, hours: confirmed.hours, days: confirmed.days };
+    }
+    // 预测 vs 实际对照（P0-5 / T-06）
+    function renderTrialCompare(rows) {
+      const box = $('trial-compare');
+      const expBtn = $('export-verification');
+      if (!box) return;
+      if (!rows || !rows.length || typeof KZTrial === 'undefined') { box.innerHTML = ''; if (expBtn) expBtn.hidden = true; return; }
+      const v = KZTrial.trialVariance(trialBaseline(), rows);
+      const row = (label, b, a, pv, unit) => `<div class="breakdown"><span>${safeText(label)}</span><span>基准 ${money(b)}${unit} → 实际 ${money(a)}${unit}（<strong>${KZTrial.pctText(pv)}</strong>）</span></div>`;
+      box.innerHTML =
+        '<div class="hint" style="margin:0 0 6px;font-weight:600;">📊 预测 vs 实际对照（' + v.days + ' 天实测）</div>' +
+        row('日均销量', v.baseline.salesAvg, v.actual.salesAvg, v.variance.salesPct, ' ' + currentUnit) +
+        row('单位变动成本', v.baseline.unitCost, v.actual.unitCost, v.variance.unitCostPct, ' 元') +
+        row('单位边际贡献', v.baseline.unitMargin, v.actual.unitMargin, v.variance.unitMarginPct, ' 元') +
+        row('单位时间回报', v.baseline.hourly, v.actual.hourly, v.variance.hourlyPct, ' 元/时') +
+        v.advice.map(a => `<div class="hint" style="margin-top:4px;">• ${safeText(a)}</div>`).join('');
+      if (expBtn) expBtn.hidden = false;
+    }
     function drawTrials() {
       const box = $("trial-list");
       if (!box) return;
@@ -3099,6 +3127,7 @@ ${decWhy}
       $("trial-summary").textContent = rows.length 
         ? `已实测记录 ${rows.length} 天，平均${sceneProfile.kind === 'service' ? '日服务量' : '日销量'} ${avg.toFixed(1)} ${currentUnit}（基准测算值为 ${confirmed.sales} ${currentUnit}）。` 
         : `建议连续记录至少 3 天真实${sceneProfile.kind === 'service' ? '服务' : '经营'}数据，用于修正测算假设。`;
+      renderTrialCompare(rows);
 
       box.querySelectorAll('[data-del-trial]').forEach(b => b.onclick = () => {
         const a = trialRows();
@@ -3107,6 +3136,20 @@ ${decWhy}
         drawTrials();
       });
     }
+
+    // 导出「假设—实际—偏差—下一次调整」验证报告（P0-5 / C-10）
+    if ($('export-verification')) $('export-verification').onclick = () => {
+      if (typeof KZTrial === 'undefined') return;
+      const rows = currentTrialRows();
+      if (!rows.length) { $('trial-summary').textContent = '还没有实测记录，先记录至少 3 天。'; return; }
+      const rep = KZTrial.buildVerificationReport(trialBaseline(), rows, { scene: { key: sceneProfile.key, unit: currentUnit, label: sceneProfile.label }, idea: $('idea').value.trim() });
+      const blob = new Blob([JSON.stringify(rep, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '开张前-试卖验证报告.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
 
     $("trial-date").value = new Date().toISOString().slice(0, 10);
     $("add-trial").onclick = () => {

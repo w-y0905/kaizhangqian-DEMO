@@ -79,8 +79,10 @@ try {
   console.log('【2】静态模块可加载');
   const s1 = await fetch(ai + '/kz-schema.js');
   const s2 = await fetch(ai + '/kz-calc.js');
+  const s3 = await fetch(ai + '/kz-trial.js');
   ok(s1.status === 200 && /javascript/.test(s1.headers.get('content-type') || ''), 'kz-schema.js 200 + js');
   ok(s2.status === 200 && /javascript/.test(s2.headers.get('content-type') || ''), 'kz-calc.js 200 + js');
+  ok(s3.status === 200 && /javascript/.test(s3.headers.get('content-type') || ''), 'kz-trial.js 200 + js');
 
   console.log('【3】离线回退（上游不可达 → rules）');
   const rr = await (await api(off, '/api/extract', { text: '我想在宿舍帮人遛狗，每次收费15元，每天接3单。' })).json();

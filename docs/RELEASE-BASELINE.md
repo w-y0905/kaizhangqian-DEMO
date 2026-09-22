@@ -37,6 +37,7 @@ curl -s http://127.0.0.1:8768/health
 | P0-3 / T-04 | AI 来源短句无核验，易被当成原文事实 | 每个字段带 `sourceType`；来源短句在原文找不到 → `inferred`（AI 推断） | `kz-schema.js` `canonicalize` + `index.html srcLabel` |
 | P0-4 | `calc` 混在页面里，无测试 | 抽出 `kz-calc.js` 纯函数（页面与测试共用），新增 `test/` 共 23 个用例 | `kz-calc.js`、`test/` |
 | P0-4 / T-03 | 服务类合并成本（清洁剂和包装）可能漏计 | 保留并复用 `normalizeServiceCosts`，合并成本进入可见直接耗材字段 | `server.cjs` |
+| P0-5 / T-06 | 试卖记录只显示平均销量，无法证明模型被校准 | 新增 `kz-trial.js`：实际单位成本/单位边际/边际时薪/销量偏差 + 调整建议 + 导出验证报告 | `kz-trial.js`、`index.html` |
 | P0-5 / T-05 | 保存 / 导出只有 confirmed 数值，无法复现 | 新增 `buildSnapshot()`：带 schemaVersion、formulaVersion、来源、默认假设、metrics | `index.html` |
 | P0-6 / T-08 | AI 追问用 `innerHTML` 拼接，存在注入风险 | 追问与假设清单统一走 `safeText()` 转义 | `index.html` |
 | P0-6 | 超时 / 回退 / 隐私边界 | 保留超时与回退提示；新增数据流向与敏感信息提示 | `index.html` |
@@ -44,7 +45,7 @@ curl -s http://127.0.0.1:8768/health
 
 ### 新增 / 改动文件
 
-- 新增：`kz-schema.js`、`kz-calc.js`、`test/schema.test.cjs`、`test/calc.test.cjs`、`README.md`、`docs/API.md`、`docs/RELEASE-BASELINE.md`
+- 新增：`kz-schema.js`、`kz-calc.js`、`kz-trial.js`、`test/schema.test.cjs`、`test/calc.test.cjs`、`test/trial.test.cjs`、`README.md`、`docs/API.md`、`docs/P0-修复清单.md`、`docs/RELEASE-BASELINE.md`、`scripts/verify-p0.*`
 - 修改：`server.cjs`（引入 schema、`/health` 版本号、静态资源 `/kz-schema.js` `/kz-calc.js`）、`index.html`（引入模块、转义、blocked 处理、快照、隐私提示）
 
 ### 验收
@@ -53,7 +54,6 @@ curl -s http://127.0.0.1:8768/health
 - 本地 `PORT=8794 node server.cjs`：`/health` 返回 schemaVersion 1.0；页面渲染关键值（月现金结余 1800.00、保本量 9.4）与人工复算一致
 - AI 路径模拟「遛狗 每周工作 4 天」→ `days` 返回 `blocked`；补上「每月 4 周」→ 换算为 16 天/月
 
-### 待办（需真实数据，暂缓）
+### 待办（需决策）
 
-- **P0-5 试卖对照**：用真实试卖数据计算 实际单位成本 / 实际时薪 / 销量偏差
 - **P0-7 冻结演示版本**：选定标杆案例（校园柠檬茶）+ 迁移案例（家教 / 洗鞋），冻结版本号与材料数字

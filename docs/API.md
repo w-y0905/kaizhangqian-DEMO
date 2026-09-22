@@ -99,3 +99,31 @@ economic  = profit − hours × wage              # 计入时间机会成本
 ```
 
 `life = 0`、`loss ≥ 100%`、`hours` 越界等非法输入必须在上游被拦截，不能传入 `calc()`。
+
+## 6. 试卖对照（kz-trial.js，P0-5 / T-06）
+
+把「实测记录」与「测算假设」按统一口径对比，输出实际单位成本、实际单位边际、实际边际时薪、销量偏差与调整建议。
+
+```js
+KZTrial.trialVariance(
+  { price, raw, pack, loss, fee, sales, hours },   // 基准（confirmed）
+  [{ sales, revenue, cost, hours, date? }]          // 实测记录（cost = 直接变动成本）
+);
+KZTrial.buildVerificationReport(baseline, trials, { scene, idea });  // 可导出 JSON
+```
+
+口径：
+
+```
+基准单位变动成本 = raw ÷ (1 − loss%) + pack + price × fee%
+基准单位边际     = price − 基准单位变动成本
+基准边际时薪     = 基准单位边际 × 基准日销量 ÷ 基准日工时
+实际单位成本     = Σ实测成本 ÷ Σ实测销量
+实际单位售价     = Σ实测收入 ÷ Σ实测销量
+实际单位边际     = 实际单位售价 − 实际单位成本
+实际边际时薪     = (Σ实测收入 − Σ实测成本) ÷ Σ实测工时
+偏差             = (实际 − 基准) ÷ 基准
+```
+
+校准案例（《计划书》第五章表 8 乌梅小番茄，12 次 / 194 盒 / 食材 480 元 / 工时 36h）：
+成本估算准确（2.47 元/盒）→ 实际 2.47 vs 基准 2.47（+0.2%）；新手自估 5 元/盒 → 实际 2.47 vs 基准 5.00（−50.5%）。

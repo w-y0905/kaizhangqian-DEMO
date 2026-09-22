@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "$0")/.."
 echo "== 1. 单元测试 =="
-node --test test/schema.test.cjs test/calc.test.cjs
+node --test test/schema.test.cjs test/calc.test.cjs test/trial.test.cjs
 echo
 echo "== 2. 端到端验证（无需真实 API）=="
 node scripts/verify-p0.mjs
