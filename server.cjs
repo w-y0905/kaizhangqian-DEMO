@@ -593,6 +593,9 @@ async function callAIClarify({ idea, question, reply, currentFields }) {
 // ── 提取结果缓存：同一段描述直接复用（含启动预热），降低响应延迟 ──
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 6 * 60 * 60 * 1000);
 const CACHE_MAX = Number(process.env.CACHE_MAX || 300);
+// 演示模式（T-07）：不调在线 AI，只用预置缓存 / 本地规则
+const DEMO_MODE = process.env.DEMO_MODE === '1';
+const CACHE_FILE = path.join(__dirname, 'cache', 'extract-cache.json');
 const aiCache = new Map();
 const cacheKey = t => String(t || '').replace(/\s+/g, ' ').trim();
 function cacheGet(k) {
@@ -602,9 +605,31 @@ function cacheGet(k) {
   aiCache.delete(k); aiCache.set(k, e); // LRU 触达
   return e.value;
 }
+let cacheWriteTimer = null;
+function persistCache() {
+  try {
+    fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
+    const entries = [...aiCache.entries()].map(([key, e]) => ({ key, at: e.at, value: e.value }));
+    fs.writeFileSync(CACHE_FILE, JSON.stringify({ schemaVersion: KZSchema.SCHEMA_VERSION, savedAt: Date.now(), entries }));
+  } catch (e) { console.error('[cache] 落盘失败：' + (e && e.message)); }
+}
+function schedulePersist() { clearTimeout(cacheWriteTimer); cacheWriteTimer = setTimeout(persistCache, 1500); }
 function cacheSet(k, v) {
   aiCache.set(k, { at: Date.now(), value: v });
   while (aiCache.size > CACHE_MAX) aiCache.delete(aiCache.keys().next().value);
+  schedulePersist();
+}
+// 冷启动：从磁盘读回缓存（schemaVersion 不符则丢弃），重启不用重新预热
+function loadCacheFromDisk() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
+    if (!raw || raw.schemaVersion !== KZSchema.SCHEMA_VERSION || !Array.isArray(raw.entries)) return 0;
+    let n = 0;
+    for (const e of raw.entries) {
+      if (e && typeof e.key === 'string' && e.value) { aiCache.set(e.key, { at: e.at || Date.now(), value: e.value }); n++; }
+    }
+    return n;
+  } catch { return 0; }
 }
 // 首页内置的 5 个样例场景描述（启动时预热，让现场演示点击即出结果）
 const PRESET_TEXTS = [
@@ -654,15 +679,22 @@ const server = http.createServer((req, res) => {
     });
     req.on('end', async () => {
       if (tooBig) return sendJSON(res, 413, { error: { code: 'BODY_TOO_LARGE', message: '请求体过大' } });
-      let text = '';
-      try { const p = JSON.parse(body); text = typeof p.text === 'string' ? p.text.trim() : ''; } catch {}
+      let text = ''; let demoFlag = false;
+      try { const p = JSON.parse(body); text = typeof p.text === 'string' ? p.text.trim() : ''; demoFlag = p.demo === true; } catch {}
       if (!text) return sendJSON(res, 400, { error: { code: 'INVALID_REQUEST', message: '缺少 text 字段' } });
 
+      const demo = DEMO_MODE || demoFlag;
       const ck = cacheKey(text);
       const hit = cacheGet(ck);
       if (hit) {
         res.setHeader('X-KZ-Cache', 'hit');
-        return sendJSON(res, 200, hit);
+        return sendJSON(res, 200, demo ? { ...hit, mode: 'demo-cache' } : hit);
+      }
+      // 演示模式：不调在线 AI，直接走本地规则
+      if (demo) {
+        const r = extractFields(text);
+        r.mode = 'demo-rules';
+        return sendJSON(res, 200, r);
       }
       try {
         const ai = await callAI(text);
@@ -699,6 +731,8 @@ const server = http.createServer((req, res) => {
       extraction: 'deepseek-direct-with-gateway-fallback',
       schemaVersion: KZSchema.SCHEMA_VERSION,
       formulaVersion: KZCalc.FORMULA_VERSION,
+      demoMode: DEMO_MODE,
+      cacheEntries: aiCache.size,
       aiConfigured: Boolean(TOKEN),
       agent: AGENT_ID,
       api: '/api/extract'
@@ -719,8 +753,10 @@ server.on('error', e => {
 server.on('listening', () => console.log('http://127.0.0.1:' + server.address().port));
 server.listen(PORT, '127.0.0.1');
 
-// 启动预热：后台把 5 个样例场景跑一遍写进缓存（不阻塞服务）
+// 启动：先读回磁盘缓存，再后台预热 5 个样例场景（不阻塞服务）
 (async () => {
+  const loaded = loadCacheFromDisk();
+  if (loaded) console.log('[cache] loaded ' + loaded + ' entries from disk');
   let ok = 0;
   for (const t of PRESET_TEXTS) {
     try {

@@ -1587,13 +1587,15 @@
     let customRelevant = [];
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const validUnit = value => /^[\p{L}]{1,8}$/u.test(String(value || '')) ? String(value) : '';
+    // 演示模式（T-07）：URL 带 ?demo=1 → 结果只走预置缓存/本地规则，不调在线 AI
+    const DEMO_PARAM = new URLSearchParams(location.search).get('demo') === '1';
     // 字段来源标签：把服务端 sourceType 映射成可核对的文案（P0-3）
     function srcLabel(info, mode) {
       const labels = (typeof KZSchema !== 'undefined' && KZSchema.SOURCE_LABELS) ? KZSchema.SOURCE_LABELS : null;
       const st = info && info.sourceType;
       const detail = (info && info.sourceText) ? String(info.sourceText) : '请核实';
       if (labels && st && labels[st]) return labels[st] + '：' + detail;
-      const base = String(mode || 'AI').startsWith('rules') ? '规则识别' : 'AI识别';
+      const base = /rules|demo/.test(String(mode || '')) ? '规则识别' : 'AI识别';
       return base + '：' + detail;
     }
     function inferTransactionUnit(text = '') {
@@ -2676,7 +2678,7 @@
           method: 'POST',
           signal: controller.signal,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, schemaVersion: '0.1' })
+          body: JSON.stringify({ text, schemaVersion: '0.1', demo: DEMO_PARAM })
         });
         if (!res.ok) throw Error('HTTP ' + res.status);
         const data = await res.json();
@@ -2773,7 +2775,10 @@
         }
 
         const qs = (data.questions || []).slice(0, 6);
-        const modeLabel = String(data.mode || 'AI').startsWith('rules') ? '规则回退引擎' : 'DeepSeek 大模型';
+        const rawMode = String(data.mode || 'AI');
+        const isDemo = /demo/.test(rawMode);
+        const isRules = rawMode.startsWith('rules') || /demo-rules/.test(rawMode);
+        const modeLabel = isDemo ? '演示模式 · 本地' : (isRules ? '规则回退引擎' : 'DeepSeek 大模型');
         $('ai-mode-tag').textContent = modeLabel;
         $('ai-summary-text').textContent = `${modeLabel} 已识别为「${sceneProfile.label}」，提取 ${n} 个关键经营参数。请按当前场景核对下方成本与工时：`;
 
@@ -3376,6 +3381,13 @@ ${decWhy}
 
     // Initialize Page
     setScene('beverage');
+    if (DEMO_PARAM) {
+      const b = document.createElement('div');
+      b.textContent = '🎬 演示模式：结果来自预置缓存 / 本地规则引擎，不调用在线 AI，断网也能演示。';
+      b.style.cssText = 'margin:10px 0;padding:8px 12px;border-radius:8px;background:#fff7e6;border:1px solid #ffd591;color:#ad6800;font-size:13px;';
+      const mainEl = document.querySelector('main');
+      if (mainEl) mainEl.insertBefore(b, mainEl.firstChild);
+    }
     render();
     drawPlans();
     renderImpact();

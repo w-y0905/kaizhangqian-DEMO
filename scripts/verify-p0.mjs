@@ -20,6 +20,7 @@ import path from 'node:path';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT_AI = 8797;      // 上游=mock
 const PORT_OFF = 8796;     // 上游不可达 → rules 回退
+const PORT_DEMO = 8795;    // 演示模式（不调在线 AI）
 const MOCK = 8798;
 let pass = 0, fail = 0;
 const ok = (c, msg) => { if (c) { pass++; console.log('  ✅ ' + msg); } else { fail++; console.log('  ❌ ' + msg); } };
@@ -44,13 +45,14 @@ const mock = http.createServer((req, res) => {
 });
 await new Promise(r => mock.listen(MOCK, '127.0.0.1', r));
 
-function startServer(port, upstream) {
+function startServer(port, upstream, extraEnv) {
   return spawn(process.execPath, ['server.cjs'], {
     cwd: ROOT,
     env: {
       ...process.env, PORT: String(port),
       DEEPSEEK_BASE_URL: upstream, DEEPSEEK_API_KEY: 'verify-key',
-      OPENCLAW_URL: upstream, AI_TIMEOUT_MS: '3000', CACHE_TTL_MS: '0'
+      OPENCLAW_URL: upstream, AI_TIMEOUT_MS: '3000', CACHE_TTL_MS: '0',
+      ...(extraEnv || {})
     },
     stdio: 'ignore'
   });
@@ -66,8 +68,10 @@ async function waitUp(port) {
 
 const childAI = startServer(PORT_AI, `http://127.0.0.1:${MOCK}`);
 const childOff = startServer(PORT_OFF, 'http://127.0.0.1:9');
+const childDemo = startServer(PORT_DEMO, `http://127.0.0.1:${MOCK}`, { DEMO_MODE: '1' });
 const ai = await waitUp(PORT_AI);
 const off = await waitUp(PORT_OFF);
+const demo = await waitUp(PORT_DEMO);
 const api = (base, p, body) => fetch(base + p, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
 
 try {
@@ -106,10 +110,19 @@ try {
   ok(!('wage' in (w1.fields || {})), '无「时薪」证据 → wage 被丢弃');
   const w2 = await (await api(ai, '/api/extract', { text: '我想帮人遛狗，自己的兼职时薪按20元算，按这个算机会成本。' })).json();
   ok(w2.fields?.wage?.value === 15, '有「兼职时薪」证据 → wage 保留（mock 值 15）');
+
+  console.log('【7】T-07 演示模式（DEMO_MODE=1，不调在线 AI）');
+  const dh = await (await fetch(demo + '/health')).json();
+  ok(dh.demoMode === true, `health.demoMode = ${dh.demoMode}`);
+  const dr = await (await api(demo, '/api/extract', { text: '我想在宿舍做洗鞋服务，每双收费25元，每天接12双，每月服务22天，清洁剂和包装成本5元。' })).json();
+  ok(/^demo-/.test(String(dr.mode)), `演示模式不走在线 AI（mode=${dr.mode}）`);
+  ok(dr.fields && Object.keys(dr.fields).length > 0, '演示模式仍返回规范化字段');
+  const d2 = await (await api(demo, '/api/extract', { text: '我想在校园摆摊卖柠檬茶，一杯卖8元，原料成本3元，每天卖30杯，每月营业20天，摊位费每月500元。' })).json();
+  ok(d2.fields?.price?.value === 8, '演示模式预设场景可出字段');
 } catch (e) {
   fail++; console.log('  ❌ 异常: ' + (e && e.message));
 } finally {
-  childAI.kill('SIGTERM'); childOff.kill('SIGTERM'); mock.close();
+  childAI.kill('SIGTERM'); childOff.kill('SIGTERM'); childDemo.kill('SIGTERM'); mock.close();
   console.log(`\n结果：${pass} 通过 / ${fail} 失败`);
   process.exit(fail ? 1 : 0);
 }
