@@ -1144,6 +1144,7 @@
           </div>
           <button id="parse" class="btn-primary" type="button">✨ 智能提取已知信息</button>
           <p id="status" class="hint" role="status" style="margin-top: 8px; font-weight: 500;"></p>
+          <p class="hint" style="margin-top: 6px; font-size: 12px; opacity: .8;">🔒 描述会发送到 DeepSeek 进行解析以识别字段，请勿输入身份证号、手机号、银行卡等敏感信息；AI 提取的数字必须由你确认后才会进入计算。</p>
         </section>
 
         <!-- Step 02: AI Feedback & Cost Leak Detection -->
@@ -1526,6 +1527,9 @@
     </footer>
   </main>
 
+  <!-- 标准化数据合同 + 确定性计算引擎（与 test/ 共用同一实现，P0-2 / P0-4） -->
+  <script src="/kz-schema.js"></script>
+  <script src="/kz-calc.js"></script>
   <script>
     const SCENE_PROFILES = {
       beverage: {
@@ -1579,6 +1583,15 @@
     let customRelevant = [];
     const safeText = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const validUnit = value => /^[\p{L}]{1,8}$/u.test(String(value || '')) ? String(value) : '';
+    // 字段来源标签：把服务端 sourceType 映射成可核对的文案（P0-3）
+    function srcLabel(info, mode) {
+      const labels = (typeof KZSchema !== 'undefined' && KZSchema.SOURCE_LABELS) ? KZSchema.SOURCE_LABELS : null;
+      const st = info && info.sourceType;
+      const detail = (info && info.sourceText) ? String(info.sourceText) : '请核实';
+      if (labels && st && labels[st]) return labels[st] + '：' + detail;
+      const base = String(mode || 'AI').startsWith('rules') ? '规则识别' : 'AI识别';
+      return base + '：' + detail;
+    }
     function inferTransactionUnit(text = '') {
       const units = '(人次|小时|课时|公斤|千克|公里|分钟|双|杯|份|件|单|次|套|条|张|本|台|个|瓶|盒|斤|米|根|串|只|支)';
       const price = String(text).match(new RegExp('(?:每|一)' + units + '(?:平均)?(?:收费|售价|卖价|卖|收|价格|定价)?\\s*\\d+(?:\\.\\d+)?\\s*元'));
@@ -1691,8 +1704,8 @@
       if (legMargin) legMargin.innerHTML = `<span class="legend-dot seg-margin"></span> ${profile.kind === 'service' ? '劳动回报空间' : '单位边际毛利'}`;
     }
 
-    // Deterministic Financial Model
-    function calc(x, f = 1) {
+    // Deterministic Financial Model —— 唯一实现在 kz-calc.js（与 test/ 共用）
+    const calc = (typeof KZCalc !== 'undefined' && KZCalc.calc) ? KZCalc.calc : function (x, f = 1) {
       const q = x.sales * f * x.days;
       const v = x.raw / (1 - x.loss / 100) + x.pack + x.price * x.fee / 100;
       const margin = x.price - v;
@@ -1709,7 +1722,7 @@
         hourly: hours > 0 ? profit / hours : 0,
         economic: profit - hours * x.wage
       };
-    }
+    };
 
     const money = n => Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const displayBreakeven = value => currentUnit === '小时' ? Math.ceil(value * 100) / 100 : Math.ceil(value);
@@ -1979,7 +1992,7 @@
         const visibleQs = expanded ? qs : qs.slice(0, 3);
         let html = visibleQs.map(q => `
           <div class="ai-question-pill" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>💡 ${q}</span>
+            <span>💡 ${safeText(q)}</span>
             <span style="font-size:11px; font-weight:700; color:var(--primary); margin-left:8px; white-space:nowrap; text-decoration:underline;">💬 回复</span>
           </div>`).join('');
         if (qs.length > 3) {
@@ -2541,7 +2554,7 @@
       pendingAssumed = assumed || [];
       const box = $('assumption-modal');
       if ($('kz-modal-count')) $('kz-modal-count').textContent = pendingAssumed.length;
-      if ($('kz-modal-list')) $('kz-modal-list').innerHTML = pendingAssumed.map(f => `<li>${f.label}</li>`).join('');
+      if ($('kz-modal-list')) $('kz-modal-list').innerHTML = pendingAssumed.map(f => `<li>${safeText(f.label)}</li>`).join('');
       if ($('kz-modal-sub')) $('kz-modal-sub').innerHTML = customRelevant.length
         ? '已按这门生意筛除不相关项；未补充的会按 <strong>0</strong> 计入，结果可能偏高。你可以先去补充，也可以直接测算。'
         : '未补充的项会按 <strong>0</strong> 计入，测算结果可能偏高。你可以先去补充，也可以直接测算。';
@@ -2555,7 +2568,7 @@
         customRelevant = [];
         pendingAssumed = collectAssumedFields();
         if ($('kz-modal-count')) $('kz-modal-count').textContent = pendingAssumed.length;
-        if ($('kz-modal-list')) $('kz-modal-list').innerHTML = pendingAssumed.map(f => `<li>${f.label}</li>`).join('');
+        if ($('kz-modal-list')) $('kz-modal-list').innerHTML = pendingAssumed.map(f => `<li>${safeText(f.label)}</li>`).join('');
         if (!pendingAssumed.length) { closeAssumptionModal(); assumptionFields = []; if (pendingConfirmX) applyConfirmed(pendingConfirmX); }
       };
       if (go) go.onclick = () => {
@@ -2678,14 +2691,18 @@
         pendingReview = true;
         
         let n = 0;
+        const blockedKeys = Array.isArray(data.blocked) ? data.blocked : [];
         for (const [k, info] of Object.entries(data.fields || {})) {
+          const srcEl = $('source-' + k);
+          // 无法换算 / 越界的字段：清空并标记待补充，绝不静默使用（P0-2）
+          if (info && info.blocked) {
+            if ($(k)) $(k).value = '';
+            if (srcEl) { srcEl.textContent = '待补充 · 单位/取值无法自动换算，请手动填写'; srcEl.className = 'source'; }
+            continue;
+          }
           if ($(k) && info && Number.isFinite(+info.value)) {
             $(k).value = info.value;
-            const srcEl = $('source-' + k);
-            if (srcEl) {
-              srcEl.textContent = (String(data.mode).startsWith('rules') ? '规则识别：' : 'AI识别：') + (info.sourceText || '请核实');
-              srcEl.className = 'source extracted';
-            }
+            if (srcEl) { srcEl.textContent = srcLabel(info, data.mode); srcEl.className = 'source extracted'; }
             n++;
           }
         }
@@ -2712,8 +2729,9 @@
             $('sales').dataset.assumed = '1';
           }
           const structuralDefaults = { days: wk ? 30 : 20, hours: 4, life: 24 };
-          // 收入驱动项（单价/交付量）缺失时必须让用户自己填：否则会静默算出 0 收入的假结果
-          const mustAskUser = new Set(['price', 'sales']);
+          // 收入驱动项（单价/交付量）与「单位无法换算」的字段必须让用户自己填：
+          // 否则会静默算出 0 收入或错误天数（P0-2）
+          const mustAskUser = new Set(['price', 'sales', ...blockedKeys]);
           for (const [k] of specs) {
             if (!$(k) || String($(k).value).trim() !== '') continue;
             if (mustAskUser.has(k)) continue;
@@ -2778,7 +2796,7 @@
             const list = $('ai-questions-list');
             list.insertAdjacentHTML('beforeend',
               '<div class="hint" style="margin:8px 0 4px;">以下成本项原文未提及，点一下即可补充（未补按 0 计）：</div>' +
-              assumed.map(f => `<div class="ai-question-pill"><span>📝 ${f.label}是多少？</span></div>`).join(''));
+              assumed.map(f => `<div class="ai-question-pill"><span>📝 ${safeText(f.label)}是多少？</span></div>`).join(''));
             bindQuestionPillClick(list);
           }
         }
@@ -3004,12 +3022,42 @@ ${decWhy}
       });
     }
 
+    // 测算快照：带 schemaVersion / formulaVersion / 来源 / 默认假设，可复现一次测算（P0-5 · T-05）
+    function buildSnapshot() {
+      const sources = {};
+      for (const [k] of specs) {
+        const srcEl = $('source-' + k);
+        sources[k] = {
+          value: confirmed[k],
+          unit: (document.querySelector(`[data-field="${k}"] .field-label`)?.textContent || '').trim(),
+          source: srcEl ? srcEl.textContent : '',
+          assumption: $(k)?.dataset.assumed === '1'
+        };
+      }
+      return {
+        product: '开张前',
+        schemaVersion: (typeof KZSchema !== 'undefined' && KZSchema.SCHEMA_VERSION) || '1.0',
+        formulaVersion: (typeof KZCalc !== 'undefined' && KZCalc.FORMULA_VERSION) || '1.0',
+        generatedAt: new Date().toISOString(),
+        scene: { key: sceneProfile.key, unit: currentUnit, label: sceneProfile.label },
+        idea: $('idea') ? $('idea').value.trim() : '',
+        factor,
+        inputs: { ...confirmed },
+        sources,
+        assumptions: assumptionFields.map(f => f.label),
+        metrics: calc(confirmed, factor),
+        scenarios: [0.8, 1, 1.2].map(f => calc(confirmed, f))
+      };
+    }
+
     $("save-plan").onclick = () => {
       if (pendingReview) return;
       const name = prompt("请为这次测算起一个方案名称：", sceneProfile.title);
       if (!name) return;
       const ps = readPlans();
-      ps.unshift({ name: name.slice(0, 30), time: new Date().toLocaleString("zh-CN"), idea: $('idea').value.trim(), scene: { key: sceneProfile.key, unit: currentUnit, label: sceneProfile.label }, values: {...confirmed} });
+      const snap = buildSnapshot();
+      // 保留 values 字段以兼容旧版「加载」逻辑；其余为可审计快照
+      ps.unshift({ name: name.slice(0, 30), time: new Date().toLocaleString("zh-CN"), idea: snap.idea, scene: snap.scene, values: { ...confirmed }, schemaVersion: snap.schemaVersion, formulaVersion: snap.formulaVersion, sources: snap.sources, assumptions: snap.assumptions });
       localStorage.setItem(plansKey, JSON.stringify(ps.slice(0, 10)));
       drawPlans();
     };
@@ -3022,14 +3070,8 @@ ${decWhy}
     };
 
     $("export-json").onclick = () => {
-      const blob = new Blob([JSON.stringify({
-        product: "开张前",
-        version: "1.0",
-        exportedAt: new Date().toISOString(),
-        scene: { key: sceneProfile.key, unit: currentUnit, label: sceneProfile.label },
-        values: confirmed,
-        scenarios: [0.8, 1, 1.2].map(f => calc(confirmed, f))
-      }, null, 2)], { type: "application/json" });
+      const snap = buildSnapshot();
+      const blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = "开张前-商业测算数据.json";

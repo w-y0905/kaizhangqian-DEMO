@@ -1,0 +1,10 @@
+{
+  "name": "kaizhangqian",
+  "version": "1.0.0",
+  "private": true,
+  "description": "开张前 —— 面向大学生微创业的智能成本测算平台",
+  "scripts": {
+    "start": "node server.cjs",
+    "test": "node --test test/schema.test.cjs test/calc.test.cjs"
+  }
+}

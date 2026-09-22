@@ -1,6 +1,8 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
+const KZSchema = require('./kz-schema.js');
+const KZCalc = require('./kz-calc.js');
 
 const PORT = Number(process.env.PORT || 8768);
 const OPENCLAW_BASE = process.env.OPENCLAW_URL || 'http://127.0.0.1:18789';
@@ -212,12 +214,17 @@ function extractFields(text) {
   // field so it cannot disappear inside the product-oriented packaging field.
   normalizeServiceCosts(fields, scene, text);
   if (scene.key === 'skill') normalizeSkillFields(fields, text);
+  const unit = inferTransactionUnit(text);
+  const canon = KZSchema.canonicalize(fields, text, { mode: 'rules', unit });
   return {
     mode: 'rules',
+    schemaVersion: KZSchema.SCHEMA_VERSION,
+    formulaVersion: KZCalc.FORMULA_VERSION,
     scene,
-    fields,
-    missing: FIELD_KEYS.filter(k => !(k in fields)),
-    questions: [...conversionQuestions(fields, text), ...sceneQuestions(scene)].slice(0, 5),
+    fields: canon.fields,
+    blocked: canon.blocked,
+    missing: FIELD_KEYS.filter(k => !(k in canon.fields) || canon.fields[k].blocked),
+    questions: [...canon.questions, ...conversionQuestions(canon.fields, text), ...sceneQuestions(scene)].slice(0, 5),
     assumptions: ['未填写的数字不会被 AI 猜测；请在确认前补充或修改。']
   };
 }
@@ -253,7 +260,13 @@ function sanitize(obj, text = '') {
     for (const k of ['price', 'raw', 'pack']) if (out.fields[k]) out.fields[k].unit = `元/${explicitUnit}`;
     if (out.fields.sales) out.fields.sales.unit = `${explicitUnit}/天`;
   }
-  out.missing = FIELD_KEYS.filter(k => !(k in out.fields));
+  // ── 标准化数据合同：统一单位 / 来源核验 / wage 证据门 / 越界拦截（P0-2、P0-3）──
+  const canon = KZSchema.canonicalize(out.fields, text, { mode: out.mode, unit: explicitUnit });
+  out.fields = canon.fields;
+  out.blocked = canon.blocked;
+  out.schemaVersion = KZSchema.SCHEMA_VERSION;
+  out.formulaVersion = KZCalc.FORMULA_VERSION;
+  out.missing = FIELD_KEYS.filter(k => !(k in out.fields) || out.fields[k].blocked);
   out.questions = Array.isArray(obj && obj.questions) ? obj.questions.slice(0, 5).map(String) : [];
   out.assumptions = Array.isArray(obj && obj.assumptions) ? obj.assumptions.slice(0, 5).map(String) : [];
   out.recommendation = typeof (obj && obj.recommendation) === 'string' ? obj.recommendation.slice(0, 240) : '';
@@ -263,7 +276,7 @@ function sanitize(obj, text = '') {
     : '';
   // AI 标注的“这门生意实际可能涉及”的字段（供前端筛缺项）
   if (!out.questions.length) out.questions = sceneQuestions(out.scene);
-  out.questions = [...conversionQuestions(out.fields, text), ...out.questions].slice(0, 5);
+  out.questions = [...canon.questions, ...conversionQuestions(out.fields, text), ...out.questions].slice(0, 5);
   // AI 标注的“这门生意实际可能涉及”的字段（供前端筛缺项），再与追问里提到的成本项对齐
   out.relevant = Array.isArray(obj && obj.relevant)
     ? obj.relevant.map(k => String(k).trim()).filter(k => FIELD_KEYS.includes(k))
@@ -658,6 +671,16 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // 静态资源：标准化模块与计算引擎（页面与测试共用同一实现）
+  if (req.method === 'GET' && (pathname === '/kz-schema.js' || pathname === '/kz-calc.js')) {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    return fs.readFile(path.join(__dirname, pathname.slice(1)), (e, c) => {
+      if (e) { res.writeHead(404).end('Not found'); return; }
+      res.end(c);
+    });
+  }
+
   if (req.method !== 'GET' || !['/', '/index.html', '/health'].includes(pathname)) {
     res.writeHead(404).end('Not found');
     return;
@@ -668,6 +691,8 @@ const server = http.createServer((req, res) => {
     return sendJSON(res, 200, {
       status: 'ok',
       extraction: 'deepseek-direct-with-gateway-fallback',
+      schemaVersion: KZSchema.SCHEMA_VERSION,
+      formulaVersion: KZCalc.FORMULA_VERSION,
       aiConfigured: Boolean(TOKEN),
       agent: AGENT_ID,
       api: '/api/extract'
