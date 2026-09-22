@@ -3,3 +3,4 @@ backups/
 *.bak
 server.pre-v03.cjs
 cache/
+build.json

@@ -76,6 +76,7 @@ try {
   ok(h.schemaVersion === '1.0', `schemaVersion = ${h.schemaVersion}`);
   ok(h.formulaVersion === '1.0', `formulaVersion = ${h.formulaVersion}`);
   ok(h.kbVersion === '1.0', `kbVersion = ${h.kbVersion}`);
+  ok('commit' in h, '/health 暴露 commit 字段（可空，供公开核验）');
 
   console.log('【2】静态模块可加载');
   const s1 = await fetch(ai + '/kz-schema.js');

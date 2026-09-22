@@ -6,6 +6,13 @@ const KZCalc = require('./kz-calc.js');
 const KZLimit = require('./kz-limit.js');
 const KZKB = require('./kz-scene-kb.js');
 
+// 构建信息（部署时写入 build.json，供公开核验）
+function readBuildInfo() {
+  try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'build.json'), 'utf8')); }
+  catch { return null; }
+}
+const BUILD = readBuildInfo();
+
 const PORT = Number(process.env.PORT || 8768);
 const OPENCLAW_BASE = process.env.OPENCLAW_URL || 'http://127.0.0.1:18789';
 const OPENCLAW_URL = OPENCLAW_BASE + '/v1/chat/completions';
@@ -758,7 +765,7 @@ const server = http.createServer((req, res) => {
   }
 
   // 静态资源：标准化模块与计算引擎（页面与测试共用同一实现）
-  if (req.method === 'GET' && (pathname === '/kz-schema.js' || pathname === '/kz-calc.js' || pathname === '/kz-trial.js' || pathname === '/kz-compare.js')) {
+  if (req.method === 'GET' && (pathname === '/kz-schema.js' || pathname === '/kz-calc.js' || pathname === '/kz-trial.js' || pathname === '/kz-compare.js' || pathname === '/build.json')) {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
     return fs.readFile(path.join(__dirname, pathname.slice(1)), (e, c) => {
@@ -780,6 +787,8 @@ const server = http.createServer((req, res) => {
       schemaVersion: KZSchema.SCHEMA_VERSION,
       formulaVersion: KZCalc.FORMULA_VERSION,
       kbVersion: KZKB.KB_VERSION,
+      commit: (BUILD && BUILD.commit) || null,
+      builtAt: (BUILD && BUILD.builtAt) || null,
       demoMode: DEMO_MODE,
       cacheEntries: aiCache.size,
       rateLimit: { enabled: LIMIT_ENABLED, perIp: perIpLimiter.config.limit, perIpWindowMs: perIpLimiter.config.windowMs, globalPerDay: globalLimiter.config.limit },
@@ -800,7 +809,7 @@ server.on('error', e => {
   if (e.code === 'EADDRINUSE') { console.error('[server] port in use'); process.exit(1); }
   else process.exit(1);
 });
-server.on('listening', () => console.log('http://127.0.0.1:' + server.address().port));
+server.on('listening', () => console.log('http://127.0.0.1:' + server.address().port + (BUILD && BUILD.commit ? '  build=' + BUILD.commit : '')));
 server.listen(PORT, '127.0.0.1');
 
 // 启动：先读回磁盘缓存，再后台预热 5 个样例场景（不阻塞服务）
