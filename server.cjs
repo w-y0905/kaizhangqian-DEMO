@@ -758,7 +758,7 @@ const server = http.createServer((req, res) => {
   }
 
   // 静态资源：标准化模块与计算引擎（页面与测试共用同一实现）
-  if (req.method === 'GET' && (pathname === '/kz-schema.js' || pathname === '/kz-calc.js' || pathname === '/kz-trial.js')) {
+  if (req.method === 'GET' && (pathname === '/kz-schema.js' || pathname === '/kz-calc.js' || pathname === '/kz-trial.js' || pathname === '/kz-compare.js')) {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
     return fs.readFile(path.join(__dirname, pathname.slice(1)), (e, c) => {

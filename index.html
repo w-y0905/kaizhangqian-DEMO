@@ -1516,9 +1516,11 @@
             <div class="toolbar">
               <button id="save-plan" type="button">💾 保存当前方案</button>
               <button id="export-json" type="button">📥 导出 JSON 数据</button>
+              <button id="compare-plans" type="button">⚖️ 对比选中方案</button>
               <button id="clear-plans" type="button">🗑 清空历史</button>
             </div>
             <div id="saved-plans" class="hint" style="margin-top: 12px;"></div>
+            <div id="compare-result" style="margin-top: 12px;"></div>
           </div>
         </div>
 
@@ -1535,6 +1537,7 @@
   <script src="kz-schema.js"></script>
   <script src="kz-calc.js"></script>
   <script src="kz-trial.js"></script>
+  <script src="kz-compare.js"></script>
   <script>
     const SCENE_PROFILES = {
       beverage: {
@@ -3016,7 +3019,7 @@ ${decWhy}
       box.innerHTML = ps.length 
         ? ps.map((a, i) => `
           <div class="breakdown">
-            <span><strong>${safeText(a.name)}</strong> · ${safeText(a.scene?.label || '未标注场景')} · ${safeText(a.time)}</span>
+            <span><input type="checkbox" class="plan-cmp" data-cmp="${i}" style="margin-right:6px;"><strong>${safeText(a.name)}</strong> · ${safeText(a.scene?.label || '未标注场景')} · ${safeText(a.time)}</span>
             <span>
               <button type="button" class="header-btn" data-load="${i}">加载</button>
               <button type="button" class="header-btn" data-delete-plan="${i}">删除</button>
@@ -3077,6 +3080,36 @@ ${decWhy}
         scenarios: [0.8, 1, 1.2].map(f => calc(confirmed, f))
       };
     }
+
+    // 方案对比（P1-04）：勾选 2–4 个已保存方案，按统一口径摊到一张表
+    if ($('compare-plans')) $('compare-plans').onclick = () => {
+      const box = $('compare-result');
+      const ps = readPlans();
+      const picked = [];
+      document.querySelectorAll('.plan-cmp:checked').forEach(c => { const i = +c.dataset.cmp; if (ps[i]) picked.push(ps[i]); });
+      if (!box) return;
+      if (picked.length < 2) { box.innerHTML = '<div class="hint">请勾选 2–4 个方案再对比。</div>'; return; }
+      if (typeof KZCompare === 'undefined') { box.innerHTML = '<div class="hint">对比模块未加载。</div>'; return; }
+      const res = KZCompare.comparePlans(picked.slice(0, 4));
+      const m = n => money(n);
+      const cell = (v, unit) => v == null ? '无法' : (m(v) + (unit || ''));
+      const rowsHtml = res.rows.map(r => `
+        <tr>
+          <td>${safeText(r.name)}</td>
+          <td>${cell(r.metrics.cash, '元')}</td>
+          <td>${cell(r.metrics.profit, '元')}</td>
+          <td>${cell(r.metrics.hourly, '元/时')}</td>
+          <td>${r.metrics.breakeven == null ? '无法保本' : m(r.metrics.breakeven)}</td>
+          <td>${r.metrics.payback == null ? '无法回本' : m(r.metrics.payback) + '月'}</td>
+        </tr>`).join('');
+      const bestName = i => (res.rows[i] ? safeText(res.rows[i].name) : '—');
+      box.innerHTML =
+        '<div class="hint" style="font-weight:600;margin-bottom:6px;">⚖️ 方案对比（共 ' + res.count + ' 个）</div>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:13px;">' +
+        '<thead><tr><th style="text-align:left;">方案</th><th>月现金结余</th><th>扣折旧盈余</th><th>折合时薪</th><th>日均保本量</th><th>回收期</th></tr></thead>' +
+        '<tbody>' + rowsHtml + '</tbody></table>' +
+        '<div class="hint" style="margin-top:6px;">🏆 现金结余最高：' + bestName(res.best.cash) + '；扣折旧盈余最高：' + bestName(res.best.profit) + '；时薪最高：' + bestName(res.best.hourly) + '</div>';
+    };
 
     $("save-plan").onclick = () => {
       if (pendingReview) return;
