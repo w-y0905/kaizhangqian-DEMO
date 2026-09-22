@@ -82,3 +82,28 @@ test('验证报告结构完整（可导出 JSON）', () => {
   assert.ok(Array.isArray(rep.advice));
   assert.ok(rep.generatedAt);
 });
+
+test('P1-05 可读版报告（文本/HTML）包含关键内容', () => {
+  const baseline = { price: 6.6, raw: 2.47, pack: 0, loss: 0, fee: 0, sales: 16, hours: 3, days: 6 };
+  const trials = [{ date: '2025-03-31', sales: 60, revenue: 396, cost: 148, hours: 3, note: '首晚' }];
+  const rep = T.buildVerificationReport(baseline, trials, { scene: { label: '其他', unit: '盒' }, idea: '乌梅小番茄' });
+  const txt = T.renderVerificationText(rep);
+  assert.ok(/试卖验证报告/.test(txt));
+  assert.ok(/预测 vs 实际/.test(txt));
+  assert.ok(/下一轮调整建议/.test(txt));
+  assert.ok(/schema 1\.0/.test(txt));
+  const html = T.renderVerificationHTML(rep);
+  assert.ok(/<table>/.test(html));
+  assert.ok(/2025-03-31/.test(html));
+  assert.ok(/<!doctype html>/i.test(html));
+});
+
+test('P1-05 HTML 报告对描述/备注做转义（防注入）', () => {
+  const baseline = { price: 10, raw: 4, pack: 0, loss: 0, fee: 0, sales: 10, hours: 2, days: 20 };
+  const trials = [{ date: '2026-01-01', sales: 10, revenue: 100, cost: 40, hours: 2, note: '<script>alert(1)</script>' }];
+  const rep = T.buildVerificationReport(baseline, trials, { scene: { label: '<b>x</b>', unit: '份' }, idea: '<img src=x onerror=alert(1)>' });
+  const html = T.renderVerificationHTML(rep);
+  assert.ok(html.indexOf('<script>alert(1)') < 0, '备注未转义');
+  assert.ok(html.indexOf('<img') < 0, '描述未转义');
+  assert.ok(/&lt;/.test(html));
+});

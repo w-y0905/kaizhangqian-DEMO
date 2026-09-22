@@ -1504,6 +1504,7 @@
             <!-- 预测 vs 实际对照（P0-5） -->
             <div id="trial-compare" style="margin-top: 14px;"></div>
             <button id="export-verification" type="button" class="header-btn" style="margin-top: 10px;" hidden>⬇️ 导出验证报告（JSON）</button>
+            <button id="export-verification-readable" type="button" class="header-btn" style="margin-top: 10px;" hidden>📄 导出可读版报告（HTML）</button>
           </div>
 
           <!-- Step 10: Save Plans -->
@@ -3155,8 +3156,9 @@ ${decWhy}
     function renderTrialCompare(rows) {
       const box = $('trial-compare');
       const expBtn = $('export-verification');
+      const expBtn2 = $('export-verification-readable');
       if (!box) return;
-      if (!rows || !rows.length || typeof KZTrial === 'undefined') { box.innerHTML = ''; if (expBtn) expBtn.hidden = true; return; }
+      if (!rows || !rows.length || typeof KZTrial === 'undefined') { box.innerHTML = ''; if (expBtn) expBtn.hidden = true; if (expBtn2) expBtn2.hidden = true; return; }
       const v = KZTrial.trialVariance(trialBaseline(), rows);
       const row = (label, b, a, pv, unit) => `<div class="breakdown"><span>${safeText(label)}</span><span>基准 ${money(b)}${unit} → 实际 ${money(a)}${unit}（<strong>${KZTrial.pctText(pv)}</strong>）</span></div>`;
       box.innerHTML =
@@ -3167,6 +3169,7 @@ ${decWhy}
         row('单位时间回报', v.baseline.hourly, v.actual.hourly, v.variance.hourlyPct, ' 元/时') +
         v.advice.map(a => `<div class="hint" style="margin-top:4px;">• ${safeText(a)}</div>`).join('');
       if (expBtn) expBtn.hidden = false;
+      if (expBtn2) expBtn2.hidden = false;
     }
     function drawTrials() {
       const box = $("trial-list");
@@ -3204,6 +3207,21 @@ ${decWhy}
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = '开张前-试卖验证报告.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    // 导出可读版报告（HTML，可打开后打印为 PDF）（P1-05）
+    if ($('export-verification-readable')) $('export-verification-readable').onclick = () => {
+      if (typeof KZTrial === 'undefined') return;
+      const rows = currentTrialRows();
+      if (!rows.length) { $('trial-summary').textContent = '还没有实测记录，先记录至少 3 天。'; return; }
+      const rep = KZTrial.buildVerificationReport(trialBaseline(), rows, { scene: { key: sceneProfile.key, unit: currentUnit, label: sceneProfile.label }, idea: $('idea').value.trim() });
+      const html = KZTrial.renderVerificationHTML(rep);
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '开张前-试卖验证报告.html';
       a.click();
       URL.revokeObjectURL(a.href);
     };

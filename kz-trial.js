@@ -130,11 +130,89 @@
     };
   }
 
+  // 可读版报告（Markdown 文本），供人看/存档（P1-05）
+  function renderVerificationText(rep) {
+    if (!rep) return '';
+    var b = rep.baselineInputs || {}, c = rep.comparison || {};
+    var pc = function (v) { return v == null ? '—' : (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%'; };
+    var L = [];
+    L.push('# 开张前 · 试卖验证报告');
+    L.push('');
+    L.push('- 报告类型：' + (rep.reportType || 'trial-verification'));
+    L.push('- 版本：schema ' + rep.schemaVersion + ' / formula ' + rep.formulaVersion);
+    L.push('- 生成时间：' + rep.generatedAt);
+    if (rep.scene) L.push('- 场景：' + (rep.scene.label || rep.scene.key || '') + (rep.scene.unit ? '（单位：' + rep.scene.unit + '）' : ''));
+    if (rep.idea) L.push('- 经营描述：' + rep.idea);
+    L.push('');
+    L.push('## 一、基准假设');
+    L.push('售价 ' + b.price + '｜直接成本 ' + b.raw + '｜包装 ' + b.pack + '｜损耗 ' + b.loss + '%｜抽成 ' + b.fee + '%｜日交付量 ' + b.sales + '｜月营业 ' + b.days + ' 天｜日工时 ' + b.hours);
+    L.push('');
+    L.push('## 二、实测记录（' + (rep.records || []).length + ' 条）');
+    L.push('| 日期 | 销量 | 收入 | 变动成本 | 工时 | 备注 |');
+    L.push('| --- | --- | --- | --- | --- | --- |');
+    (rep.records || []).forEach(function (r) {
+      L.push('| ' + (r.date || '') + ' | ' + r.sales + ' | ' + r.revenue + ' | ' + r.cost + ' | ' + r.hours + ' | ' + (r.note || '') + ' |');
+    });
+    L.push('');
+    L.push('## 三、预测 vs 实际');
+    L.push('| 指标 | 基准 | 实际 | 偏差 |');
+    L.push('| --- | --- | --- | --- |');
+    L.push('| 单位变动成本 | ' + fmt(c.unitCost && c.unitCost.baseline) + ' | ' + fmt(c.unitCost && c.unitCost.actual) + ' | ' + pc(c.unitCost && c.unitCost.variance) + ' |');
+    L.push('| 单位边际贡献 | ' + fmt(c.unitMargin && c.unitMargin.baseline) + ' | ' + fmt(c.unitMargin && c.unitMargin.actual) + ' | ' + pc(c.unitMargin && c.unitMargin.variance) + ' |');
+    L.push('| 日均销量 | ' + fmt(c.salesAvg && c.salesAvg.baseline) + ' | ' + fmt(c.salesAvg && c.salesAvg.actual) + ' | ' + pc(c.salesAvg && c.salesAvg.variance) + ' |');
+    L.push('| 单位时间回报 | ' + fmt(c.hourly && c.hourly.baseline) + ' | ' + fmt(c.hourly && c.hourly.actual) + ' | ' + pc(c.hourly && c.hourly.variance) + ' |');
+    L.push('');
+    L.push('## 四、下一轮调整建议');
+    (rep.advice || []).forEach(function (a) { L.push('- ' + a); });
+    return L.join('\n');
+  }
+
+  function fmt(n) { return (n == null || !isFinite(n)) ? '—' : (Math.round(n * 100) / 100).toString(); }
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]; }); }
+
+  // 可读版报告（自包含 HTML，可浏览器打开后打印为 PDF）
+  function renderVerificationHTML(rep) {
+    if (!rep) return '';
+    var b = rep.baselineInputs || {}, c = rep.comparison || {};
+    var pc = function (v) { return v == null ? '—' : (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%'; };
+    var rows = (rep.records || []).map(function (r) {
+      return '<tr><td>' + esc(r.date) + '</td><td>' + r.sales + '</td><td>' + r.revenue + '</td><td>' + r.cost + '</td><td>' + r.hours + '</td><td>' + esc(r.note) + '</td></tr>';
+    }).join('');
+    var cmp = [
+      ['单位变动成本', c.unitCost], ['单位边际贡献', c.unitMargin], ['日均销量', c.salesAvg], ['单位时间回报', c.hourly]
+    ].map(function (p) {
+      var m = p[1] || {};
+      return '<tr><td>' + p[0] + '</td><td>' + fmt(m.baseline) + '</td><td>' + fmt(m.actual) + '</td><td>' + pc(m.variance) + '</td></tr>';
+    }).join('');
+    var advice = (rep.advice || []).map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('');
+    return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">'
+      + '<title>开张前 · 试卖验证报告</title><style>'
+      + 'body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;max-width:820px;margin:24px auto;padding:0 16px;color:#222;}'
+      + 'h1{font-size:20px;} h2{font-size:15px;margin-top:20px;} table{border-collapse:collapse;width:100%;font-size:13px;}'
+      + 'th,td{border:1px solid #ddd;padding:6px 8px;text-align:left;} th{background:#f6f8ff;}'
+      + '.meta{font-size:13px;color:#555;} ul{font-size:13px;}'
+      + '@media print{body{margin:0;}}'
+      + '</style></head><body>'
+      + '<h1>开张前 · 试卖验证报告</h1>'
+      + '<p class="meta">报告类型：' + esc(rep.reportType) + '　版本：schema ' + esc(rep.schemaVersion) + ' / formula ' + esc(rep.formulaVersion) + '　生成：' + esc(rep.generatedAt) + '</p>'
+      + (rep.scene ? '<p class="meta">场景：' + esc(rep.scene.label || rep.scene.key) + (rep.scene.unit ? '（单位：' + esc(rep.scene.unit) + '）' : '') + '</p>' : '')
+      + (rep.idea ? '<p class="meta">经营描述：' + esc(rep.idea) + '</p>' : '')
+      + '<h2>一、基准假设</h2><p class="meta">售价 ' + b.price + '　直接成本 ' + b.raw + '　包装 ' + b.pack + '　损耗 ' + b.loss + '%　抽成 ' + b.fee + '%　日交付量 ' + b.sales + '　月营业 ' + b.days + ' 天　日工时 ' + b.hours + '</p>'
+      + '<h2>二、实测记录（' + (rep.records || []).length + ' 条）</h2><table><thead><tr><th>日期</th><th>销量</th><th>收入</th><th>变动成本</th><th>工时</th><th>备注</th></tr></thead><tbody>' + rows + '</tbody></table>'
+      + '<h2>三、预测 vs 实际</h2><table><thead><tr><th>指标</th><th>基准</th><th>实际</th><th>偏差</th></tr></thead><tbody>' + cmp + '</tbody></table>'
+      + '<h2>四、下一轮调整建议</h2><ul>' + advice + '</ul>'
+      + '<p class="meta">本报告由「开张前」平台生成，仅供参考。</p>'
+      + '</body></html>';
+  }
+
   return {
     FORMULA_VERSION: FORMULA_VERSION,
     baselineUnitCost: baselineUnitCost,
     trialVariance: trialVariance,
     buildVerificationReport: buildVerificationReport,
+    renderVerificationText: renderVerificationText,
+    renderVerificationHTML: renderVerificationHTML,
     pctText: pctText
   };
 });
