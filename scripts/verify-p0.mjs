@@ -82,6 +82,7 @@ try {
   const h = await (await fetch(ai + '/health')).json();
   ok(h.schemaVersion === '1.0', `schemaVersion = ${h.schemaVersion}`);
   ok(h.formulaVersion === '1.0', `formulaVersion = ${h.formulaVersion}`);
+  ok(h.kbVersion === '1.0', `kbVersion = ${h.kbVersion}`);
 
   console.log('【2】静态模块可加载');
   const s1 = await fetch(ai + '/kz-schema.js');
@@ -131,6 +132,12 @@ try {
   ok(l1.status === 200 && l2.status === 200, `前 2 次放行（${l1.status}/${l2.status}）`);
   ok(l3.status === 429, `第 3 次返回 429（实际 ${l3.status}）`);
   ok(l3.json?.error?.code === 'RATE_LIMITED', '429 响应体带 RATE_LIMITED');
+
+  console.log('【9】P1-03 场景知识库');
+  const kbR = await (await api(ai, '/api/extract', { text: '我想在宿舍做洗鞋服务，每双收费25元，每天接12双，每月服务22天，清洁剂和包装成本5元。' })).json();
+  ok(kbR.kb && kbR.kb.domain === 'wash', `kb.domain = ${kbR.kb && kbR.kb.domain}`);
+  ok(kbR.kb && Array.isArray(kbR.kb.hints) && kbR.kb.hints.length > 0, '返回参考区间 hints');
+  ok(kbR.kb && !('value' in (kbR.kb.hints[0] || {})), 'hints 不带 value（不会自动填入）');
 } catch (e) {
   fail++; console.log('  ❌ 异常: ' + (e && e.message));
 } finally {

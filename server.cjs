@@ -4,6 +4,7 @@ const path = require('node:path');
 const KZSchema = require('./kz-schema.js');
 const KZCalc = require('./kz-calc.js');
 const KZLimit = require('./kz-limit.js');
+const KZKB = require('./kz-scene-kb.js');
 
 const PORT = Number(process.env.PORT || 8768);
 const OPENCLAW_BASE = process.env.OPENCLAW_URL || 'http://127.0.0.1:18789';
@@ -227,6 +228,7 @@ function extractFields(text) {
     scene,
     fields: canon.fields,
     blocked: canon.blocked,
+    kb: KZKB.summary(KZKB.matchDomain(text)),
     missing: FIELD_KEYS.filter(k => !(k in canon.fields) || canon.fields[k].blocked),
     questions: [...canon.questions, ...conversionQuestions(canon.fields, text), ...sceneQuestions(scene)].slice(0, 5),
     assumptions: ['未填写的数字不会被 AI 猜测；请在确认前补充或修改。']
@@ -270,6 +272,7 @@ function sanitize(obj, text = '') {
   out.blocked = canon.blocked;
   out.schemaVersion = KZSchema.SCHEMA_VERSION;
   out.formulaVersion = KZCalc.FORMULA_VERSION;
+  out.kb = KZKB.summary(KZKB.matchDomain(text));
   out.missing = FIELD_KEYS.filter(k => !(k in out.fields) || out.fields[k].blocked);
   out.questions = Array.isArray(obj && obj.questions) ? obj.questions.slice(0, 5).map(String) : [];
   out.assumptions = Array.isArray(obj && obj.assumptions) ? obj.assumptions.slice(0, 5).map(String) : [];
@@ -313,7 +316,8 @@ function inferRelevantFromQuestions(questions) {
 }
 
 function buildPrompt(text) {
-  return `请解析下面这段大学生创业描述，并只输出一个 JSON 对象，不要 Markdown：
+  const kbCtx = KZKB.promptContext(text);
+  return `${kbCtx ? kbCtx + '\n\n' : ''}请解析下面这段大学生创业描述，并只输出一个 JSON 对象，不要 Markdown：
 {
   "title": "",
   "relevant": [],
@@ -775,6 +779,7 @@ const server = http.createServer((req, res) => {
       extraction: 'deepseek-direct-with-gateway-fallback',
       schemaVersion: KZSchema.SCHEMA_VERSION,
       formulaVersion: KZCalc.FORMULA_VERSION,
+      kbVersion: KZKB.KB_VERSION,
       demoMode: DEMO_MODE,
       cacheEntries: aiCache.size,
       rateLimit: { enabled: LIMIT_ENABLED, perIp: perIpLimiter.config.limit, perIpWindowMs: perIpLimiter.config.windowMs, globalPerDay: globalLimiter.config.limit },

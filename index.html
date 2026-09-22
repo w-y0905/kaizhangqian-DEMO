@@ -1154,6 +1154,7 @@
             <span class="ai-status-tag" id="ai-mode-tag">DeepSeek 大模型</span>
           </div>
           <p class="hint" id="ai-summary-text">已接入 DeepSeek 大模型：输入经营描述并点击“智能提取”，AI 会识别经营场景、提取已知参数，并针对你的成本盲区生成追问。</p>
+          <div class="hint" id="kb-hint" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;background:#f6f8ff;border:1px solid #dbe3ff;"></div>
           
           <div id="ai-questions-container">
             <div class="ai-questions-list" id="ai-questions-list">
@@ -1597,6 +1598,16 @@
       if (labels && st && labels[st]) return labels[st] + '：' + detail;
       const base = /rules|demo/.test(String(mode || '')) ? '规则识别' : 'AI识别';
       return base + '：' + detail;
+    }
+    // 场景参考区间提示（P1-03；仅供参考，不自动填入）
+    function renderKbHint(kb) {
+      const el = $('kb-hint');
+      if (!el) return;
+      if (!kb || !kb.hints || !kb.hints.length) { el.style.display = 'none'; el.textContent = ''; return; }
+      const parts = kb.hints.map(h => `${h.label} ${h.range}`).join('｜');
+      el.innerHTML = '📏 参考区间（仅供参考，不会自动填入）：' + safeText(parts) +
+        ((kb.oftenMissed && kb.oftenMissed.length) ? '<br>⚠️ 易漏项：' + safeText(kb.oftenMissed.join('、')) : '');
+      el.style.display = 'block';
     }
     function inferTransactionUnit(text = '') {
       const units = '(人次|小时|课时|公斤|千克|公里|分钟|双|杯|份|件|单|次|套|条|张|本|台|个|瓶|盒|斤|米|根|串|只|支)';
@@ -2781,6 +2792,7 @@
         const modeLabel = isDemo ? '演示模式 · 本地' : (isRules ? '规则回退引擎' : 'DeepSeek 大模型');
         $('ai-mode-tag').textContent = modeLabel;
         $('ai-summary-text').textContent = `${modeLabel} 已识别为「${sceneProfile.label}」，提取 ${n} 个关键经营参数。请按当前场景核对下方成本与工时：`;
+        renderKbHint(data.kb);
 
         // 自定义输入：用 AI 识别出的场景简称做决策大盘标题（识别不出时退回识别到的场景类别）
         if (isCustomText) {
