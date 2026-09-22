@@ -151,13 +151,16 @@ function normalizeSkillFields(fields, text = '') {
 }
 
 function normalizeServiceCosts(fields, scene, text = '') {
-  if (scene.kind !== 'service') return;
-  if (!fields.raw && !fields.pack) {
-    const combined = String(text).match(/(?:清洁剂和包装|耗材和包装|材料和包装)(?:成本|费用)?\s*(?:为|是|约)?\s*(\d+(?:\.\d+)?)\s*(?:元|块)/);
-    const direct = String(text).match(/(?:清洁剂|耗材|材料|相纸和打印|打印)(?:成本|费用)?\s*(?:为|是|约)?\s*(\d+(?:\.\d+)?)\s*(?:元|块)/);
+  const s = String(text);
+  // 按单/按双的服务（如洗鞋）即使被模型归为 other，也要把「清洁剂和包装」这类合并成本计进去（T-03）
+  const serviceLike = scene.kind === 'service' || /(每双|按双|清洁剂|洗鞋|代洗)/.test(s);
+  if (!fields.raw && !fields.pack && serviceLike) {
+    const combined = s.match(/(?:清洁剂和包装|耗材和包装|材料和包装)(?:成本|费用)?\s*(?:为|是|约)?\s*(\d+(?:\.\d+)?)\s*(?:元|块)/);
+    const direct = s.match(/(?:清洁剂|耗材|材料|相纸和打印|打印)(?:成本|费用)?\s*(?:为|是|约)?\s*(\d+(?:\.\d+)?)\s*(?:元|块)/);
     const match = combined || direct;
     if (match) fields.raw = { value: Number(match[1]), unit: '', sourceText: match[0], confidence: 0.9, needsConfirmation: true };
   }
+  if (scene.kind !== 'service') return;
   const raw = fields.raw, pack = fields.pack;
   if (pack && !raw) {
     fields.raw = pack;
