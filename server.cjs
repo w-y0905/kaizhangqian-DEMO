@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const KZSchema = require('./kz-schema.js');
 const KZCalc = require('./kz-calc.js');
+const KZLimit = require('./kz-limit.js');
 
 const PORT = Number(process.env.PORT || 8768);
 const OPENCLAW_BASE = process.env.OPENCLAW_URL || 'http://127.0.0.1:18789';
@@ -631,6 +632,40 @@ function loadCacheFromDisk() {
     return n;
   } catch { return 0; }
 }
+// ── 限流（T-10）：只对会调用在线 AI 的请求计数；缓存命中 / 演示模式放行 ──
+const LIMIT_ENABLED = process.env.RATE_LIMIT !== '0';
+const perIpLimiter = KZLimit.createLimiter({
+  limit: Number(process.env.RATE_LIMIT_PER_IP || 20),
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000)
+});
+const globalLimiter = KZLimit.createLimiter({
+  limit: Number(process.env.RATE_LIMIT_GLOBAL || 500),
+  windowMs: 24 * 60 * 60 * 1000
+});
+// 白名单（演示机 IP 等）：逗号分隔
+const LIMIT_WHITELIST = String(process.env.RATE_LIMIT_WHITELIST || '').split(',').map(s => s.trim()).filter(Boolean);
+function clientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return String(xff).split(',')[0].trim();
+  const xr = req.headers['x-real-ip'];
+  if (xr) return String(xr).trim();
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+function rateLimitCheck(req) {
+  const ip = clientIp(req);
+  if (LIMIT_WHITELIST.indexOf(ip) >= 0) return { allowed: true, ip: ip, reason: '' };
+  const g = globalLimiter.check('__global__');
+  if (!g.allowed) {
+    console.warn('[limit] 全局日额度已达上限');
+    return { allowed: false, ip: ip, reason: 'global', retryAfterSeconds: Math.max(1, Math.ceil(g.retryAfterMs / 1000)) };
+  }
+  const p = perIpLimiter.check(ip);
+  if (!p.allowed) {
+    return { allowed: false, ip: ip, reason: 'per-ip', retryAfterSeconds: Math.max(1, Math.ceil(p.retryAfterMs / 1000)) };
+  }
+  return { allowed: true, ip: ip, reason: '' };
+}
+
 // 首页内置的 5 个样例场景描述（启动时预热，让现场演示点击即出结果）
 const PRESET_TEXTS = [
   '我想在校园摆摊卖柠檬茶，一杯卖8元，原料成本3元，每天卖30杯，每月营业20天，摊位费每月500元。',
@@ -696,6 +731,15 @@ const server = http.createServer((req, res) => {
         r.mode = 'demo-rules';
         return sendJSON(res, 200, r);
       }
+      // 限流：缓存命中 / 演示模式已在上面放行，这里只计会调用 AI 的请求
+      if (LIMIT_ENABLED) {
+        const rl = rateLimitCheck(req);
+        if (!rl.allowed) {
+          res.setHeader('Retry-After', String(rl.retryAfterSeconds));
+          console.warn('[limit] 触发限流（' + rl.reason + '）ip=' + rl.ip);
+          return sendJSON(res, 429, { error: { code: 'RATE_LIMITED', message: '请求过于频繁，请稍后再试。' }, retryAfterSeconds: rl.retryAfterSeconds });
+        }
+      }
       try {
         const ai = await callAI(text);
         if (ai && typeof ai.mode === 'string' && !ai.mode.startsWith('rules')) cacheSet(ck, ai);
@@ -733,6 +777,7 @@ const server = http.createServer((req, res) => {
       formulaVersion: KZCalc.FORMULA_VERSION,
       demoMode: DEMO_MODE,
       cacheEntries: aiCache.size,
+      rateLimit: { enabled: LIMIT_ENABLED, perIp: perIpLimiter.config.limit, perIpWindowMs: perIpLimiter.config.windowMs, globalPerDay: globalLimiter.config.limit },
       aiConfigured: Boolean(TOKEN),
       agent: AGENT_ID,
       api: '/api/extract'

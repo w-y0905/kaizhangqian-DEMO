@@ -21,6 +21,7 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT_AI = 8797;      // 上游=mock
 const PORT_OFF = 8796;     // 上游不可达 → rules 回退
 const PORT_DEMO = 8795;    // 演示模式（不调在线 AI）
+const PORT_LIMIT = 8794;   // 限流（小阀值）
 const MOCK = 8798;
 let pass = 0, fail = 0;
 const ok = (c, msg) => { if (c) { pass++; console.log('  ✅ ' + msg); } else { fail++; console.log('  ❌ ' + msg); } };
@@ -69,9 +70,11 @@ async function waitUp(port) {
 const childAI = startServer(PORT_AI, `http://127.0.0.1:${MOCK}`);
 const childOff = startServer(PORT_OFF, 'http://127.0.0.1:9');
 const childDemo = startServer(PORT_DEMO, `http://127.0.0.1:${MOCK}`, { DEMO_MODE: '1' });
+const childLimit = startServer(PORT_LIMIT, 'http://127.0.0.1:9', { RATE_LIMIT_PER_IP: '2', RATE_LIMIT_WINDOW_MS: '60000', RATE_LIMIT_GLOBAL: '1000' });
 const ai = await waitUp(PORT_AI);
 const off = await waitUp(PORT_OFF);
 const demo = await waitUp(PORT_DEMO);
+const limit = await waitUp(PORT_LIMIT);
 const api = (base, p, body) => fetch(base + p, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
 
 try {
@@ -119,10 +122,19 @@ try {
   ok(dr.fields && Object.keys(dr.fields).length > 0, '演示模式仍返回规范化字段');
   const d2 = await (await api(demo, '/api/extract', { text: '我想在校园摆摊卖柠檬茶，一杯卖8元，原料成本3元，每天卖30杯，每月营业20天，摊位费每月500元。' })).json();
   ok(d2.fields?.price?.value === 8, '演示模式预设场景可出字段');
+
+  console.log('【8】T-10 限流（RATE_LIMIT_PER_IP=2）');
+  const limitHit = async (text) => { const r = await api(limit, '/api/extract', { text }); return { status: r.status, json: await r.json().catch(() => ({})) }; };
+  const l1 = await limitHit('限流测试文本一');
+  const l2 = await limitHit('限流测试文本二');
+  const l3 = await limitHit('限流测试文本三');
+  ok(l1.status === 200 && l2.status === 200, `前 2 次放行（${l1.status}/${l2.status}）`);
+  ok(l3.status === 429, `第 3 次返回 429（实际 ${l3.status}）`);
+  ok(l3.json?.error?.code === 'RATE_LIMITED', '429 响应体带 RATE_LIMITED');
 } catch (e) {
   fail++; console.log('  ❌ 异常: ' + (e && e.message));
 } finally {
-  childAI.kill('SIGTERM'); childOff.kill('SIGTERM'); childDemo.kill('SIGTERM'); mock.close();
+  childAI.kill('SIGTERM'); childOff.kill('SIGTERM'); childDemo.kill('SIGTERM'); childLimit.kill('SIGTERM'); mock.close();
   console.log(`\n结果：${pass} 通过 / ${fail} 失败`);
   process.exit(fail ? 1 : 0);
 }
