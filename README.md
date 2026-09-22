@@ -16,6 +16,8 @@
 | `kz-schema.js` | **标准化数据合同**：统一单位、来源核验、wage 证据门、越界拦截（前后端 / 测试共用） |
 | `kz-calc.js` | **确定性计算引擎**：纯函数，页面与测试共用同一实现 |
 | `test/*.test.cjs` | 公式与合同测试（`node --test`） |
+| `scripts/verify-p0.sh` | 一键验证：单元测试 + 端到端（内置 mock，无需真实 API） |
+| `docs/P0-修复清单.md` | **每处 P0 修复的改前/改后/位置/验证（可逐条核对）** |
 | `docs/API.md` | 接口与字段合同 |
 | `docs/RELEASE-BASELINE.md` | 发布基线、校验值与回滚步骤 |
 
@@ -38,6 +40,8 @@ node server.cjs            # 默认监听 127.0.0.1:8768
 node --test test/schema.test.cjs test/calc.test.cjs
 # 或
 npm test
+# 一键（含端到端，无需真实 API）
+bash scripts/verify-p0.sh
 ```
 
 覆盖：单位换算（每周↔每天↔每月）、wage 证据门、来源核验、取值范围边界、边际为负 / 极端损耗 /
