@@ -1,0 +1,13 @@
+{
+  "title": "宠物代遛",
+  "relevant": ["price", "sales", "raw", "hours"],
+  "scene": { "key": "other" },
+  "fields": {
+    "price": { "value": 15, "unit": "元/次", "sourceText": "每次收费15元", "confidence": 0.9 },
+    "days": { "value": 4, "unit": "天/周", "sourceText": "每周工作4天", "confidence": 0.8 },
+    "wage": { "value": 15, "unit": "元/小时", "sourceText": "每次收费15元", "confidence": 0.4 }
+  },
+  "questions": [],
+  "assumptions": [],
+  "recommendation": ""
+}

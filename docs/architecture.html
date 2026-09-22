@@ -1,0 +1,95 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>开张前 · 技术架构</title>
+<style>
+  :root {
+    --bg: #f8fafc; --fg: #172033; --muted: #5b6475; --line: #64748b;
+    --neutral: #e2e8f0; --input: #bfdbfe; --process: #c7d2fe; --storage: #99f6e4; --external: #fde68a;
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 14px/1.4 ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  main { max-width: 980px; margin: 28px auto; padding: 0 20px; }
+  svg { width: 100%; height: auto; display: block; }
+  .title { font-size: 21px; font-weight: 700; fill: var(--fg); }
+  .label { font-size: 14px; font-weight: 600; fill: var(--fg); }
+  .small { font-size: 12px; fill: var(--muted); }
+  .node { stroke: var(--line); stroke-width: 1; }
+  .input { fill: var(--input); } .process { fill: var(--process); }
+  .storage { fill: var(--storage); } .external { fill: var(--external); } .neutral { fill: var(--neutral); }
+  .edge { stroke: var(--line); stroke-width: 1.6; fill: none; }
+  .link { stroke: var(--line); stroke-width: 1.2; fill: none; stroke-dasharray: 5 4; opacity: 0.85; }
+</style>
+<main>
+<svg viewBox="0 0 980 700" role="img" aria-label="开张前平台技术架构">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <text class="title" x="40" y="34">开张前 · 技术架构（双引擎：AI 理解 + 确定性复算）</text>
+
+  <!-- connectors: main chain -->
+  <path class="edge" marker-end="url(#arrow)" d="M320,134 L320,166" />
+  <path class="edge" marker-end="url(#arrow)" d="M320,222 L320,254" />
+  <path class="edge" marker-end="url(#arrow)" d="M320,310 L320,342" />
+  <path class="edge" marker-end="url(#arrow)" d="M320,398 L320,430" />
+  <path class="edge" marker-end="url(#arrow)" d="M320,486 L320,518" />
+  <!-- side links -->
+  <path class="link" marker-end="url(#arrow)" d="M636,204 L604,190" />
+  <path class="link" marker-end="url(#arrow)" d="M636,292 L604,278" />
+  <path class="link" marker-end="url(#arrow)" d="M636,380 L604,204" />
+  <path class="link" marker-end="url(#arrow)" d="M636,468 L604,454" />
+  <path class="link" marker-end="url(#arrow)" d="M636,556 L604,454" />
+
+  <!-- main chain nodes -->
+  <rect class="node input" x="40" y="70" width="560" height="64" rx="10" />
+  <text class="label" x="58" y="98">① 输入层</text>
+  <text class="small" x="58" y="118">自然语言描述 · 5 类预设 · 自定义场景</text>
+
+  <rect class="node external" x="40" y="166" width="560" height="56" rx="10" />
+  <text class="label" x="58" y="190">② AI 理解层</text>
+  <text class="small" x="58" y="209">DeepSeek 直连 → 网关回退 → 规则兜底（只理解与追问，不直接算利润）</text>
+
+  <rect class="node process" x="40" y="254" width="560" height="56" rx="10" />
+  <text class="label" x="58" y="278">③ 标准化与校验层 · kz-schema.js</text>
+  <text class="small" x="58" y="297">统一单位 · 来源核验 · wage 证据门 · 越界拦截 · 无法换算即 blocked</text>
+
+  <rect class="node neutral" x="40" y="342" width="560" height="56" rx="10" />
+  <text class="label" x="58" y="366">④ 用户确认层</text>
+  <text class="small" x="58" y="385">逐项确认关键参数 · 默认假设标注 · 确认后才进入计算</text>
+
+  <rect class="node storage" x="40" y="430" width="560" height="56" rx="10" />
+  <text class="label" x="58" y="454">⑤ 确定性计算层 · kz-calc.js</text>
+  <text class="small" x="58" y="473">本量利公式 · 纯函数 · 页面与测试共用同一实现</text>
+
+  <rect class="node process" x="40" y="518" width="560" height="64" rx="10" />
+  <text class="label" x="58" y="546">⑥ 验证与输出层</text>
+  <text class="small" x="58" y="566">试卖对照 kz-trial · 方案对比 kz-compare · 可读版/JSON 报告导出</text>
+
+  <!-- side modules -->
+  <rect class="node external" x="636" y="176" width="304" height="56" rx="10" />
+  <text class="label" x="652" y="200">场景知识库 · kz-scene-kb</text>
+  <text class="small" x="652" y="219">11 个场景域 · 注入追问与参考区间（不填数字）</text>
+
+  <rect class="node external" x="636" y="264" width="304" height="56" rx="10" />
+  <text class="label" x="652" y="288">限流 · kz-limit</text>
+  <text class="small" x="652" y="307">按 IP 20/10min + 全局 500/天 · 缓存与演示放行</text>
+
+  <rect class="node storage" x="636" y="352" width="304" height="56" rx="10" />
+  <text class="label" x="652" y="376">缓存落盘 · cache/</text>
+  <text class="small" x="652" y="395">预置结果冷启动读回 · 演示模式 ?demo=1</text>
+
+  <rect class="node storage" x="636" y="440" width="304" height="56" rx="10" />
+  <text class="label" x="652" y="464">本地存储 · localStorage</text>
+  <text class="small" x="652" y="483">保存方案快照 · 试卖记录</text>
+
+  <rect class="node neutral" x="636" y="528" width="304" height="64" rx="10" />
+  <text class="label" x="652" y="556">测试 · test/*.cjs</text>
+  <text class="small" x="652" y="575">46+ 用例 · scripts/verify-p0.sh 一键回归</text>
+
+  <text class="small" x="40" y="628">原则：AI 不猜数字——数值一律由用户提供/确认；所有金额经确定性公式复算，可追溯、可回滚。</text>
+  <text class="small" x="40" y="648">部署：nginx(/kaizhangqian/ → 127.0.0.1:8768) · PM2 kaizhangqian-demo · 版本 schema/formula/kb 均 1.0</text>
+</svg>
+</main>
