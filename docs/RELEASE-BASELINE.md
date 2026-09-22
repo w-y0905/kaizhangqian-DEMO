@@ -54,6 +54,31 @@ curl -s http://127.0.0.1:8768/health
 - 本地 `PORT=8794 node server.cjs`：`/health` 返回 schemaVersion 1.0；页面渲染关键值（月现金结余 1800.00、保本量 9.4）与人工复算一致
 - AI 路径模拟「遛狗 每周工作 4 天」→ `days` 返回 `blocked`；补上「每月 4 周」→ 换算为 16 天/月
 
-### 待办（需决策）
+## 三、部署记录
+
+| 项 | 值 |
+| --- | --- |
+| 部署时间 | 2026-09-22 17:44 (Asia/Shanghai) |
+| 部署 commit | `a1a044e`（分支 `p0-hardening` 快进合并到 `main`） |
+| 线上 commit | main @ `a1a044e`（已 push 到 origin） |
+| 上线前文件备份 | `server.cjs.bak-p0-20260922-174403`、`index.html.bak-p0-20260922-174403` |
+| 操作 | `git merge --ff-only p0-hardening` → `pm2 restart kaizhangqian-demo` |
+| 线上验证 | `/health` 返回 schema 1.0/formula 1.0；`/kaizhangqian/kz-*.js` 均 200；真实 AI 提取「遛狗 每周 4 天」→ `blocked:['days']`、`wage` 被证据门丢弃；页面 KZSchema/KZCalc/KZTrial 均加载，calc 月现金结余 1800.00 |
+
+### 回滚
+
+```bash
+cd /var/www/kaizhangqian
+git checkout 45fa909            # 回到基线
+pm2 restart kaizhangqian-demo
+# 或用备份覆盖：
+# cp server.cjs.bak-p0-20260922-174403 server.cjs
+# cp index.html.bak-p0-20260922-174403 index.html
+# pm2 restart kaizhangqian-demo
+```
+
+## 四、待办（需决策）
 
 - **P0-7 冻结演示版本**：选定标杆案例（校园柠檬茶）+ 迁移案例（家教 / 洗鞋），冻结版本号与材料数字
+  - 已定：标杆案例 = **乌梅小番茄（真实案例）**；试卖口径 = 12 次均摊；T-03 洗鞋合并成本 = 直接计入不拆分
+  - 迁移案例：待确认是否需要
