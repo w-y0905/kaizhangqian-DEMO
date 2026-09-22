@@ -613,7 +613,10 @@ const PRESET_TEXTS = [
 ];
 
 const server = http.createServer((req, res) => {
-  const pathname = new URL(req.url, 'http://localhost').pathname;
+  let pathname = new URL(req.url, 'http://localhost').pathname;
+  // 兼容 nginx 反代：/kaizhangqian/ 前缀可能被保留传入
+  if (pathname.startsWith('/kaizhangqian/')) pathname = pathname.slice('/kaizhangqian'.length);
+  else if (pathname === '/kaizhangqian') pathname = '/';
 
     // ── POST /api/clarify 智能追问回答与参数修正接口 ──
   if (req.method === 'POST' && (pathname === '/api/clarify' || pathname === '/kaizhangqian/api/clarify')) {
